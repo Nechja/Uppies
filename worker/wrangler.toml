@@ -33,7 +33,7 @@ bindings = [
 
 [[migrations]]
 tag = "v1"
-new_classes = ["StatusHub"]
+new_sqlite_classes = ["StatusHub"]
 
 [[routes]]
 pattern = "uppies.example.com"
