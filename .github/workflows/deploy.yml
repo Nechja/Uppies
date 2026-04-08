@@ -40,12 +40,7 @@ jobs:
           if [ -n "${SITE_DOMAIN}" ]; then
             sed -i "s/uppies.example.com/${SITE_DOMAIN}/" worker/wrangler.toml
           else
-            python3 -c "
-import re
-t = open('worker/wrangler.toml').read()
-t = re.sub(r'\[\[routes\]\][^\[]*', '', t, flags=re.DOTALL)
-open('worker/wrangler.toml', 'w').write(t)
-"
+            sed -i '/^\[\[routes\]\]/,/^$/d' worker/wrangler.toml
           fi
 
       - name: Apply D1 schema
