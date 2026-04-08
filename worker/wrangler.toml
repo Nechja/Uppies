@@ -6,6 +6,8 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 SITE_TITLE = "Uppies"
 SITE_THEME = "cyberpunk"
+CACHE_TTL = "30"
+MAX_BODY_BYTES = "1048576"
 
 [assets]
 directory = "../app/dist"

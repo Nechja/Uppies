@@ -4,4 +4,6 @@ export interface Env {
   readonly STATUS_HUB: DurableObjectNamespace
   readonly SITE_TITLE: string
   readonly SITE_THEME: string
+  readonly CACHE_TTL: string
+  readonly MAX_BODY_BYTES: string
 }

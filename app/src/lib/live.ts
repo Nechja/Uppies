@@ -26,8 +26,11 @@ export function openLiveConnection(callbacks: LiveCallbacks): () => void {
     }
 
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data as string) as LiveMessage
-      callbacks.onMonitors(data.monitors)
+      try {
+        const data = JSON.parse(event.data as string) as LiveMessage
+        callbacks.onMonitors(data.monitors)
+      } catch {
+      }
     }
 
     ws.onclose = () => {

@@ -18,8 +18,16 @@ type MonitorRow = {
   readonly config_json: string
 }
 
+function parseConfig(raw: string): Partial<Monitor> {
+  try {
+    return JSON.parse(raw) as Partial<Monitor>
+  } catch {
+    return {}
+  }
+}
+
 function rowToMonitor(row: MonitorRow): Monitor {
-  const config = JSON.parse(row.config_json) as Partial<Monitor>
+  const config = parseConfig(row.config_json)
   return {
     id: row.id,
     name: row.name,

@@ -16,7 +16,8 @@ function resolveJsonPath(body: unknown, path: string): unknown {
 
 async function assertBody(
   response: Response,
-  monitor: Monitor
+  monitor: Monitor,
+  maxBodyBytes: number
 ): Promise<Result<void, CheckError>> {
   if (monitor.expect === undefined) return ok(undefined)
   if (
@@ -27,7 +28,35 @@ async function assertBody(
     return ok(undefined)
   }
 
-  const text = await response.text()
+  const reader = response.body?.getReader()
+  const reader = response.body?.getReader()
+  if (reader === undefined) {
+    return err({ type: 'network', message: 'Response body is null' })
+  }
+
+  const chunks: Uint8Array[] = []
+  let totalBytes = 0
+  for (;;) {
+    const { done, value } = await reader.read()
+    if (done) break
+    totalBytes += value.byteLength
+    if (totalBytes > maxBodyBytes) {
+      reader.cancel()
+      return err({ type: 'assertion', message: `Response body exceeded ${maxBodyBytes} bytes` })
+    }
+    chunks.push(value)
+  }
+
+  const text = new TextDecoder().decode(
+    chunks.length === 1
+      ? chunks[0]
+      : chunks.reduce((acc, chunk) => {
+          const merged = new Uint8Array(acc.byteLength + chunk.byteLength)
+          merged.set(acc)
+          merged.set(chunk, acc.byteLength)
+          return merged
+        }, new Uint8Array(0))
+  )
 
   if (
     monitor.expect.bodyContains !== undefined &&
@@ -50,7 +79,12 @@ async function assertBody(
   }
 
   if (monitor.expect.jsonPath !== undefined) {
-    const parsed: unknown = JSON.parse(text)
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(text)
+    } catch {
+      return err({ type: 'assertion', message: 'Response body is not valid JSON' })
+    }
     const value = resolveJsonPath(parsed, monitor.expect.jsonPath)
     if (String(value) !== monitor.expect.jsonValue) {
       return err({
@@ -65,6 +99,8 @@ async function assertBody(
 
 export class HttpCheckRunner implements CheckRunner {
   readonly supportedType = 'http' as const
+
+  constructor(private readonly maxBodyBytes: number) {}
 
   async run(monitor: Monitor): Promise<Result<CheckOutcome, CheckError>> {
     if (monitor.url === undefined) {
@@ -100,7 +136,7 @@ export class HttpCheckRunner implements CheckRunner {
       })
     }
 
-    const bodyResult = await assertBody(response, monitor)
+    const bodyResult = await assertBody(response, monitor, this.maxBodyBytes)
     if (!bodyResult.ok) {
       return ok({
         monitorId: monitor.id,

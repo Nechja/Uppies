@@ -20,8 +20,10 @@ function buildServices(env: Env) {
   const checkResultRepository = new D1CheckResultRepository(env.DB)
   const incidentRepository = new D1IncidentRepository(env.DB)
 
+  const maxBodyBytes = parseInt(env.MAX_BODY_BYTES, 10)
+
   const checkRunnerRegistry = new CheckRunnerRegistry([
-    new HttpCheckRunner(),
+    new HttpCheckRunner(maxBodyBytes),
     new TlsCheckRunner(),
     new TcpCheckRunner(),
   ])
@@ -68,6 +70,22 @@ async function broadcastStatus(env: Env, statusHandler: StatusHandler): Promise<
 
 const monitorIdPattern = /^\/api\/monitors\/([^/]+)$/
 
+async function cachedJson(
+  request: Request,
+  env: Env,
+  handler: () => Promise<Response>
+): Promise<Response> {
+  const cache = caches.default
+  const cached = await cache.match(request)
+  if (cached !== undefined) return cached
+
+  const fresh = await handler()
+  const response = new Response(fresh.body, fresh)
+  response.headers.set('Cache-Control', `public, max-age=${env.CACHE_TTL}`)
+  await cache.put(request, response.clone())
+  return response
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
@@ -77,8 +95,10 @@ export default {
     }
 
     if (url.pathname === '/api/monitors') {
-      const { statusHandler } = buildServices(env)
-      return statusHandler.handle()
+      return cachedJson(request, env, async () => {
+        const { statusHandler } = buildServices(env)
+        return statusHandler.handle()
+      })
     }
 
     if (url.pathname === '/api/live') {
@@ -90,8 +110,10 @@ export default {
 
     const monitorMatch = monitorIdPattern.exec(url.pathname)
     if (monitorMatch !== null && monitorMatch[1] !== undefined) {
-      const { monitorDetailHandler } = buildServices(env)
-      return monitorDetailHandler.handle(monitorMatch[1])
+      return cachedJson(request, env, async () => {
+        const { monitorDetailHandler } = buildServices(env)
+        return monitorDetailHandler.handle(monitorMatch[1])
+      })
     }
 
     return env.ASSETS.fetch(request)
