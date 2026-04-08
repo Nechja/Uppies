@@ -82,15 +82,7 @@ monitors:
       status: 200
       max_ms: 50
 
-  - id: cloudflare-dns-tcp
-    name: Cloudflare DNS Port
-    host: 1.1.1.1
-    port: 53
-    type: tcp
-    interval_seconds: 60
-    timeout_ms: 5000
-
-  - id: google-dns-tcp
+- id: google-dns-tcp
     name: Google DNS Port
     host: 8.8.8.8
     port: 53
