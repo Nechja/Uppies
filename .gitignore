@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.wrangler/
+app/dist/
+tokens/dist/
+*.local
+.*
+.dev.vars
+!.gitignore
+!.github
