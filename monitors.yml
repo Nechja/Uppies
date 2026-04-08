@@ -82,7 +82,7 @@ monitors:
       status: 200
       max_ms: 50
 
-- id: google-dns-tcp
+  - id: google-dns-tcp
     name: Google DNS Port
     host: 8.8.8.8
     port: 53
