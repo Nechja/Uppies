@@ -29,7 +29,6 @@ async function assertBody(
   }
 
   const reader = response.body?.getReader()
-  const reader = response.body?.getReader()
   if (reader === undefined) {
     return err({ type: 'network', message: 'Response body is null' })
   }
