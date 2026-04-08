@@ -106,7 +106,7 @@ function run() {
   const tmpFile = join(tmpdir(), `uppies-seed-${Date.now()}.sql`)
   writeFileSync(tmpFile, sql)
 
-  const target = isRemote ? '' : '--local'
+  const target = isRemote ? '--remote' : '--local'
   const command = `pnpm exec wrangler d1 execute uppies ${target} --file=${tmpFile}`
 
   console.log(`Seeding ${monitorsFile.monitors.length} monitors${isRemote ? ' (remote)' : ' (local)'}...`)
