@@ -3,7 +3,7 @@ monitors:
     name: GitHub
     url: https://github.com
     type: http
-    interval_seconds: 60
+    interval_seconds: 600
     timeout_ms: 10000
     tls_warn_days: 30
     expect:
@@ -24,14 +24,14 @@ monitors:
     host: github.com
     port: 443
     type: tcp
-    interval_seconds: 60
+    interval_seconds: 600
     timeout_ms: 5000
 
   - id: cloudflare
     name: Cloudflare
     url: https://cloudflare.com
     type: http
-    interval_seconds: 60
+    interval_seconds: 600
     timeout_ms: 10000
     tls_warn_days: 30
     expect:
@@ -42,7 +42,7 @@ monitors:
     name: JSONPlaceholder API
     url: https://jsonplaceholder.typicode.com/todos/1
     type: http
-    interval_seconds: 120
+    interval_seconds: 600
     timeout_ms: 8000
     expect:
       status: 200
@@ -54,7 +54,7 @@ monitors:
     name: HTTPBin JSON
     url: https://httpbin.org/json
     type: http
-    interval_seconds: 120
+    interval_seconds: 600
     timeout_ms: 8000
     expect:
       status: 200
@@ -66,7 +66,7 @@ monitors:
     name: GitHub No 500
     url: https://github.com
     type: http
-    interval_seconds: 120
+    interval_seconds: 600
     timeout_ms: 10000
     expect:
       status: 200
@@ -76,7 +76,7 @@ monitors:
     name: JSONPlaceholder (tight SLA)
     url: https://jsonplaceholder.typicode.com/todos/1
     type: http
-    interval_seconds: 60
+    interval_seconds: 600
     timeout_ms: 8000
     expect:
       status: 200
@@ -87,14 +87,14 @@ monitors:
     host: 8.8.8.8
     port: 53
     type: tcp
-    interval_seconds: 60
+    interval_seconds: 600
     timeout_ms: 5000
 
   - id: github-status
     name: GitHub Status API
     url: https://www.githubstatus.com/api/v2/status.json
     type: http
-    interval_seconds: 120
+    interval_seconds: 600
     timeout_ms: 8000
     expect:
       status: 200
