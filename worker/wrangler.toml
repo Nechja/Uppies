@@ -18,7 +18,7 @@ binding = "ASSETS"
 ip = "0.0.0.0"
 port = 8787
 
-[[triggers.crons]]
+[triggers]
 crons = ["* * * * *"]
 
 [[d1_databases]]
