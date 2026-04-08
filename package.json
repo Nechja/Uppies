@@ -1,0 +1,26 @@
+{
+  "name": "uppies",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n worker,app -c cyan,magenta \"pnpm --filter worker dev\" \"pnpm --filter app dev\"",
+    "build": "pnpm --filter tokens build && pnpm --filter app build",
+    "tokens": "pnpm --filter tokens build",
+    "deploy": "pnpm build && pnpm --filter worker deploy",
+    "seed": "tsx scripts/seed.ts",
+    "seed:remote": "tsx scripts/seed.ts --remote"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@bundled-es-modules/glob",
+      "esbuild",
+      "style-dictionary",
+      "workerd"
+    ]
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "js-yaml": "^4.1.0",
+    "@types/js-yaml": "^4.0.0",
+    "tsx": "^4.0.0"
+  }
+}

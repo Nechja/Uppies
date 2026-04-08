@@ -1,0 +1,111 @@
+monitors:
+  - id: github
+    name: GitHub
+    url: https://github.com
+    type: http
+    interval_seconds: 60
+    timeout_ms: 10000
+    tls_warn_days: 30
+    expect:
+      status: 200
+      body_contains: "GitHub"
+      max_ms: 2000
+
+  - id: github-tls
+    name: GitHub TLS
+    url: https://github.com
+    type: tls
+    interval_seconds: 3600
+    timeout_ms: 10000
+    tls_warn_days: 30
+
+  - id: github-tcp
+    name: GitHub HTTPS Port
+    host: github.com
+    port: 443
+    type: tcp
+    interval_seconds: 60
+    timeout_ms: 5000
+
+  - id: cloudflare
+    name: Cloudflare
+    url: https://cloudflare.com
+    type: http
+    interval_seconds: 60
+    timeout_ms: 10000
+    tls_warn_days: 30
+    expect:
+      status: 200
+      max_ms: 1500
+
+  - id: jsonplaceholder
+    name: JSONPlaceholder API
+    url: https://jsonplaceholder.typicode.com/todos/1
+    type: http
+    interval_seconds: 120
+    timeout_ms: 8000
+    expect:
+      status: 200
+      json_path: "$.completed"
+      json_value: "false"
+      max_ms: 1000
+
+  - id: httpbin-json
+    name: HTTPBin JSON
+    url: https://httpbin.org/json
+    type: http
+    interval_seconds: 120
+    timeout_ms: 8000
+    expect:
+      status: 200
+      json_path: "$.slideshow.title"
+      json_value: "Sample Slide Show"
+      max_ms: 3000
+
+  - id: github-no-error
+    name: GitHub No 500
+    url: https://github.com
+    type: http
+    interval_seconds: 120
+    timeout_ms: 10000
+    expect:
+      status: 200
+      body_not_contains: "500 Internal Server Error"
+
+  - id: jsonplaceholder-degraded
+    name: JSONPlaceholder (tight SLA)
+    url: https://jsonplaceholder.typicode.com/todos/1
+    type: http
+    interval_seconds: 60
+    timeout_ms: 8000
+    expect:
+      status: 200
+      max_ms: 50
+
+  - id: cloudflare-dns-tcp
+    name: Cloudflare DNS Port
+    host: 1.1.1.1
+    port: 53
+    type: tcp
+    interval_seconds: 60
+    timeout_ms: 5000
+
+  - id: google-dns-tcp
+    name: Google DNS Port
+    host: 8.8.8.8
+    port: 53
+    type: tcp
+    interval_seconds: 60
+    timeout_ms: 5000
+
+  - id: github-status
+    name: GitHub Status API
+    url: https://www.githubstatus.com/api/v2/status.json
+    type: http
+    interval_seconds: 120
+    timeout_ms: 8000
+    expect:
+      status: 200
+      json_path: "$.status.indicator"
+      json_value: "none"
+      max_ms: 2000

@@ -1,0 +1,41 @@
+{
+  "color": {
+    "bg": {
+      "base":    { "value": "#000000" },
+      "surface": { "value": "#0a0a0a" },
+      "raised":  { "value": "#111111" }
+    },
+    "border": {
+      "subtle":  { "value": "#1a1a1a" },
+      "default": { "value": "#2a2a2a" },
+      "bright":  { "value": "#33ff66" }
+    },
+    "text": {
+      "primary":   { "value": "#33ff66" },
+      "secondary": { "value": "#22cc55" },
+      "muted":     { "value": "#115522" }
+    },
+    "status": {
+      "up":       { "value": "#33ff66" },
+      "degraded": { "value": "#ffff00" },
+      "down":     { "value": "#ff3333" },
+      "unknown":  { "value": "#444444" }
+    },
+    "accent": {
+      "primary":   { "value": "#33ff66" },
+      "secondary": { "value": "#00ffff" },
+      "glow":      { "value": "rgba(51,255,102,0.15)" }
+    }
+  },
+  "font": {
+    "family": {
+      "base": { "value": "'Monaspace Neon', 'Courier New', monospace" },
+      "ui":   { "value": "'Monaspace Neon', 'Courier New', monospace" }
+    }
+  },
+  "effect": {
+    "glow-status": { "value": "0 0 6px currentColor" },
+    "glow-accent": { "value": "0 0 12px rgba(51,255,102,0.5)" },
+    "scanlines":   { "value": "1" }
+  }
+}

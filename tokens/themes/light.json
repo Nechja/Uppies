@@ -1,0 +1,41 @@
+{
+  "color": {
+    "bg": {
+      "base":    { "value": "#f7f5f0" },
+      "surface": { "value": "#ffffff" },
+      "raised":  { "value": "#f0ede8" }
+    },
+    "border": {
+      "subtle":  { "value": "#e8e4de" },
+      "default": { "value": "#d4cfc8" },
+      "bright":  { "value": "#b0a898" }
+    },
+    "text": {
+      "primary":   { "value": "#1a1814" },
+      "secondary": { "value": "#5a5650" },
+      "muted":     { "value": "#9a9690" }
+    },
+    "status": {
+      "up":       { "value": "#16a34a" },
+      "degraded": { "value": "#d97706" },
+      "down":     { "value": "#dc2626" },
+      "unknown":  { "value": "#94a3b8" }
+    },
+    "accent": {
+      "primary":   { "value": "#2563eb" },
+      "secondary": { "value": "#7c3aed" },
+      "glow":      { "value": "rgba(37,99,235,0.08)" }
+    }
+  },
+  "font": {
+    "family": {
+      "base": { "value": "'Inter', system-ui, sans-serif" },
+      "ui":   { "value": "'Inter', system-ui, sans-serif" }
+    }
+  },
+  "effect": {
+    "glow-status": { "value": "none" },
+    "glow-accent": { "value": "none" },
+    "scanlines":   { "value": "0" }
+  }
+}

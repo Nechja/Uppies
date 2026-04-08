@@ -1,0 +1,51 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Scanlines — active on themes that set scanlines: 1 */
+
+[data-theme="cyberpunk"] body::after,
+[data-theme="terminal"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.12) 2px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Ambient color bleed — cyberpunk: red + purple */
+
+[data-theme="cyberpunk"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 80%, rgba(255, 0, 48, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 20%, rgba(128, 64, 160, 0.06) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Ambient color bleed — terminal: phosphor green */
+
+[data-theme="terminal"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(51, 255, 102, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 9998;
+}

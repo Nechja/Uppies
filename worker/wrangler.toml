@@ -1,0 +1,38 @@
+name = "uppies-worker"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+SITE_TITLE = "Uppies"
+SITE_THEME = "cyberpunk"
+
+[assets]
+directory = "../app/dist"
+not_found_handling = "single-page-application"
+binding = "ASSETS"
+
+[dev]
+ip = "0.0.0.0"
+port = 8787
+
+[[triggers.crons]]
+crons = ["* * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "uppies"
+database_id = "your-d1-database-id-here"
+
+[durable_objects]
+bindings = [
+  { name = "STATUS_HUB", class_name = "StatusHub" }
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["StatusHub"]
+
+[[routes]]
+pattern = "uppies.example.com"
+custom_domain = true

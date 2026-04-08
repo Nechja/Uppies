@@ -1,0 +1,38 @@
+{
+  "spacing": {
+    "1": { "value": "4px" },
+    "2": { "value": "8px" },
+    "3": { "value": "12px" },
+    "4": { "value": "16px" },
+    "6": { "value": "24px" },
+    "8": { "value": "32px" },
+    "12": { "value": "48px" },
+    "16": { "value": "64px" }
+  },
+  "radius": {
+    "sm": { "value": "4px" },
+    "md": { "value": "8px" },
+    "lg": { "value": "12px" },
+    "full": { "value": "9999px" }
+  },
+  "font": {
+    "size": {
+      "xs": { "value": "11px" },
+      "sm": { "value": "13px" },
+      "md": { "value": "15px" },
+      "lg": { "value": "18px" },
+      "xl": { "value": "24px" },
+      "2xl": { "value": "32px" },
+      "3xl": { "value": "48px" }
+    },
+    "weight": {
+      "normal": { "value": "400" },
+      "medium": { "value": "500" },
+      "bold": { "value": "700" }
+    }
+  },
+  "transition": {
+    "fast": { "value": "120ms ease" },
+    "base": { "value": "200ms ease" }
+  }
+}

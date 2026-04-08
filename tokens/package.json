@@ -1,0 +1,12 @@
+{
+  "name": "tokens",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsx style-dictionary.config.ts"
+  },
+  "devDependencies": {
+    "style-dictionary": "^4.0.0",
+    "typescript": "^5.5.0"
+  }
+}
