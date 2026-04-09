@@ -94,7 +94,7 @@
 </script>
 
 <div class="bar" role="img" aria-label="Uptime history">
-  {#each buckets as bucket (bucket.label)}
+  {#each buckets as bucket (bucket.start)}
     <button
       class="segment"
       class:selected={selectedLabel === bucket.label}
