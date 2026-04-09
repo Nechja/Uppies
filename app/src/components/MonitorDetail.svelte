@@ -110,23 +110,30 @@
         {#if selectedLogs.length === 0}
           <p class="message">No checks recorded for this period.</p>
         {:else}
-          <ul class="log-list">
-            {#each selectedLogs as entry (entry.checkedAt)}
-              <li class="log-entry" data-status={entry.status}>
-                <span class="log-time">{formatTime(entry.checkedAt)}</span>
-                <StatusBadge status={entry.status} />
-                {#if entry.responseMs !== undefined}
-                  <span class="log-meta">{entry.responseMs}ms</span>
-                {/if}
-                {#if entry.statusCode !== undefined}
-                  <span class="log-meta">{entry.statusCode}</span>
-                {/if}
-                {#if entry.error !== undefined}
-                  <span class="log-error">{entry.error}</span>
-                {/if}
-              </li>
-            {/each}
-          </ul>
+          <div class="table-wrap">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Response</th>
+                  <th>Code</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each selectedLogs as entry (entry.checkedAt)}
+                  <tr data-status={entry.status}>
+                    <td class="log-time">{formatTime(entry.checkedAt)}</td>
+                    <td><StatusBadge status={entry.status} /></td>
+                    <td class="log-meta">{entry.responseMs !== undefined ? `${entry.responseMs}ms` : ''}</td>
+                    <td class="log-meta">{entry.statusCode ?? ''}</td>
+                    <td class="log-error">{entry.error ?? ''}</td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
         {/if}
       </section>
     {/if}
@@ -240,32 +247,42 @@
   .message { color: var(--upp-color-text-secondary); font-size: var(--upp-font-size-sm); }
   .message.error { color: var(--upp-color-status-down); }
 
-  .log-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: var(--upp-radius-md);
+    border: 1px solid var(--upp-color-border-subtle);
   }
 
-  .log-entry {
-    display: flex;
-    gap: var(--upp-spacing-3);
-    align-items: center;
-    padding: var(--upp-spacing-2) var(--upp-spacing-4);
-    background: var(--upp-color-bg-surface);
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
     font-size: var(--upp-font-size-sm);
-    font-family: var(--upp-font-family-base);
   }
 
-  .log-entry:first-child { border-radius: var(--upp-radius-sm) var(--upp-radius-sm) 0 0; }
-  .log-entry:last-child { border-radius: 0 0 var(--upp-radius-sm) var(--upp-radius-sm); }
-  .log-entry:only-child { border-radius: var(--upp-radius-sm); }
+  .log-table th {
+    text-align: left;
+    padding: var(--upp-spacing-2) var(--upp-spacing-4);
+    font-size: var(--upp-font-size-xs);
+    font-weight: var(--upp-font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--upp-color-text-muted);
+    background: var(--upp-color-bg-surface);
+    border-bottom: 1px solid var(--upp-color-border-subtle);
+  }
+
+  .log-table td {
+    padding: var(--upp-spacing-2) var(--upp-spacing-4);
+    border-bottom: 1px solid var(--upp-color-border-subtle);
+  }
+
+  .log-table tbody tr:last-child td {
+    border-bottom: none;
+  }
 
   .log-time {
     color: var(--upp-color-text-muted);
-    min-width: 80px;
+    white-space: nowrap;
   }
 
   .log-meta {
@@ -274,8 +291,6 @@
 
   .log-error {
     color: var(--upp-color-status-down);
-    margin-left: auto;
-    text-align: right;
   }
 
   .incident-list {

@@ -30,6 +30,13 @@
     return 'up'
   }
 
+  function effectiveDays(results: ReadonlyArray<CheckResult>, maxDays: number): number {
+    if (results.length === 0) return 1
+    const earliest = Math.min(...results.map((r) => r.checkedAt))
+    const spanDays = Math.ceil((Date.now() - earliest) / MS_PER_DAY)
+    return Math.max(1, Math.min(spanDays + 1, maxDays))
+  }
+
   function buildDailyBuckets(
     results: ReadonlyArray<CheckResult>,
     bucketDays: number
@@ -70,8 +77,9 @@
     results: ReadonlyArray<CheckResult>,
     viewDays: number
   ): ReadonlyArray<Bucket> {
-    if (viewDays <= 2) return buildHourlyBuckets(results, viewDays * 24)
-    return buildDailyBuckets(results, viewDays)
+    const span = effectiveDays(results, viewDays)
+    if (span <= 2) return buildHourlyBuckets(results, span * 24)
+    return buildDailyBuckets(results, span)
   }
 
   const buckets = $derived(buildBuckets(history, days))
