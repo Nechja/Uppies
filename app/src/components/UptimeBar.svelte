@@ -100,9 +100,11 @@
       class:selected={selectedStart === bucket.start}
       class:clickable={bucket.status !== 'empty'}
       data-status={bucket.status}
-      title={bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}
+      aria-label={bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}
       onclick={() => handleClick(bucket)}
-    ></button>
+    >
+      <span class="tooltip">{bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}</span>
+    </button>
   {/each}
 </div>
 
@@ -120,6 +122,7 @@
     border-radius: 2px;
     border: none;
     padding: 0;
+    position: relative;
     transition: opacity var(--upp-transition-fast);
   }
 
@@ -139,4 +142,25 @@
   [data-status='degraded'] { background: var(--upp-color-status-degraded); }
   [data-status='down']     { background: var(--upp-color-status-down); }
   [data-status='empty']    { background: var(--upp-color-border-subtle); }
+
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--upp-color-bg-surface);
+    border: 1px solid var(--upp-color-border-subtle);
+    color: var(--upp-color-text-primary);
+    font-size: var(--upp-font-size-xs);
+    padding: var(--upp-spacing-1) var(--upp-spacing-2);
+    border-radius: var(--upp-radius-sm);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .segment:hover .tooltip {
+    display: block;
+  }
 </style>
