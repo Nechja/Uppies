@@ -54,7 +54,7 @@
   }
 
   function formatTime(ts: number): string {
-    return new Date(ts).toLocaleTimeString()
+    return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   }
 
   function handleBucketSelect(range: { start: number; end: number; label: string }) {
@@ -297,6 +297,7 @@
   .log-time {
     color: var(--upp-color-text-muted);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
 
   .log-meta {
