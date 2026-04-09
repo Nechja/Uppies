@@ -132,8 +132,7 @@
   }
 
   .selected {
-    box-shadow: 0 0 0 2px var(--upp-color-accent-primary);
-    transform: scaleY(1.3);
+    opacity: 0.5;
   }
 
   [data-status='up']       { background: var(--upp-color-status-up); }

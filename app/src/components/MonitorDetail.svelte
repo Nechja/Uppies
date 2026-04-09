@@ -23,6 +23,15 @@
     )
   })())
 
+  const historySpanLabel = $derived<string>((() => {
+    if (state.type !== 'loaded') return ''
+    const h = state.detail.history
+    if (h.length === 0) return `${state.detail.monitor.historyDays}-day history`
+    const earliest = Math.min(...h.map((r) => r.checkedAt))
+    const spanDays = Math.ceil((Date.now() - earliest) / 86_400_000)
+    return spanDays <= 1 ? 'Today' : `${spanDays}-day history`
+  })())
+
   async function load() {
     state = { type: 'loading' }
     const result = await fetchMonitorDetail(monitorId)
@@ -96,7 +105,7 @@
     </div>
 
     <section class="section">
-      <h2 class="section-title">{state.detail.monitor.historyDays}-day history</h2>
+      <h2 class="section-title">{historySpanLabel}</h2>
       <UptimeBar
         history={state.detail.history}
         days={state.detail.monitor.historyDays}
