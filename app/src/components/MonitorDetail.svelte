@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { fetchMonitorDetail } from '../lib/api.ts'
-  import type { MonitorDetail as MonitorDetailType } from '../lib/types.ts'
+  import type { MonitorDetail as MonitorDetailType, CheckResult } from '../lib/types.ts'
   import StatusBadge from './StatusBadge.svelte'
   import UptimeBar from './UptimeBar.svelte'
 
@@ -14,6 +14,14 @@
     | { type: 'error'; message: string }
 
   let state = $state<LoadState>({ type: 'loading' })
+  let selectedRange = $state<{ start: number; end: number; label: string } | null>(null)
+
+  const selectedLogs = $derived<ReadonlyArray<CheckResult>>((() => {
+    if (state.type !== 'loaded' || selectedRange === null) return []
+    return state.detail.history.filter(
+      (r) => r.checkedAt >= selectedRange.start && r.checkedAt < selectedRange.end
+    )
+  })())
 
   async function load() {
     state = { type: 'loading' }
@@ -36,6 +44,14 @@
     return new Date(ts).toLocaleString()
   }
 
+  function formatTime(ts: number): string {
+    return new Date(ts).toLocaleTimeString()
+  }
+
+  function handleBucketSelect(range: { start: number; end: number; label: string }) {
+    selectedRange = selectedRange?.label === range.label ? null : range
+  }
+
   onMount(load)
 </script>
 
@@ -53,10 +69,10 @@
     </div>
 
     <div class="stats">
-      {#if state.detail.monitor.uptimePercent30d !== null}
+      {#if state.detail.monitor.uptimePercent !== null}
         <div class="stat">
-          <span class="stat-label">30-day uptime</span>
-          <span class="stat-value">{state.detail.monitor.uptimePercent30d}%</span>
+          <span class="stat-label">{state.detail.monitor.historyDays}-day uptime</span>
+          <span class="stat-value">{state.detail.monitor.uptimePercent}%</span>
         </div>
       {/if}
       {#if state.detail.monitor.responseMs !== null}
@@ -80,9 +96,40 @@
     </div>
 
     <section class="section">
-      <h2 class="section-title">90-day history</h2>
-      <UptimeBar history={state.detail.history} days={90} />
+      <h2 class="section-title">{state.detail.monitor.historyDays}-day history</h2>
+      <UptimeBar
+        history={state.detail.history}
+        days={state.detail.monitor.historyDays}
+        onSelect={handleBucketSelect}
+      />
     </section>
+
+    {#if selectedRange !== null}
+      <section class="section">
+        <h2 class="section-title">Checks for {selectedRange.label}</h2>
+        {#if selectedLogs.length === 0}
+          <p class="message">No checks recorded for this period.</p>
+        {:else}
+          <ul class="log-list">
+            {#each selectedLogs as entry (entry.checkedAt)}
+              <li class="log-entry" data-status={entry.status}>
+                <span class="log-time">{formatTime(entry.checkedAt)}</span>
+                <StatusBadge status={entry.status} />
+                {#if entry.responseMs !== undefined}
+                  <span class="log-meta">{entry.responseMs}ms</span>
+                {/if}
+                {#if entry.statusCode !== undefined}
+                  <span class="log-meta">{entry.statusCode}</span>
+                {/if}
+                {#if entry.error !== undefined}
+                  <span class="log-error">{entry.error}</span>
+                {/if}
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      </section>
+    {/if}
 
     {#if state.detail.incidents.length > 0}
       <section class="section">
@@ -192,6 +239,44 @@
 
   .message { color: var(--upp-color-text-secondary); font-size: var(--upp-font-size-sm); }
   .message.error { color: var(--upp-color-status-down); }
+
+  .log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .log-entry {
+    display: flex;
+    gap: var(--upp-spacing-3);
+    align-items: center;
+    padding: var(--upp-spacing-2) var(--upp-spacing-4);
+    background: var(--upp-color-bg-surface);
+    font-size: var(--upp-font-size-sm);
+    font-family: var(--upp-font-family-base);
+  }
+
+  .log-entry:first-child { border-radius: var(--upp-radius-sm) var(--upp-radius-sm) 0 0; }
+  .log-entry:last-child { border-radius: 0 0 var(--upp-radius-sm) var(--upp-radius-sm); }
+  .log-entry:only-child { border-radius: var(--upp-radius-sm); }
+
+  .log-time {
+    color: var(--upp-color-text-muted);
+    min-width: 80px;
+  }
+
+  .log-meta {
+    color: var(--upp-color-text-secondary);
+  }
+
+  .log-error {
+    color: var(--upp-color-status-down);
+    margin-left: auto;
+    text-align: right;
+  }
 
   .incident-list {
     list-style: none;

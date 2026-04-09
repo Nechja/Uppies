@@ -6,4 +6,5 @@ export interface Env {
   readonly SITE_THEME: string
   readonly CACHE_TTL: string
   readonly MAX_BODY_BYTES: string
+  readonly HISTORY_DAYS: string
 }

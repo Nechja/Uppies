@@ -21,8 +21,8 @@
         <button class="monitor-button" onclick={() => onSelectMonitor(monitor.id)}>
           <span class="monitor-name">{monitor.name}</span>
           <span class="monitor-meta">
-            {#if monitor.uptimePercent30d !== null}
-              <span class="meta-item">{monitor.uptimePercent30d}%</span>
+            {#if monitor.uptimePercent !== null}
+              <span class="meta-item">{monitor.uptimePercent}%</span>
             {/if}
             {#if monitor.responseMs !== null}
               <span class="meta-item">{monitor.responseMs}ms</span>

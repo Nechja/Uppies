@@ -6,11 +6,12 @@ type MonitorStatus = {
   readonly id: string
   readonly name: string
   readonly type: string
+  readonly historyDays: number
   readonly currentStatus: string | null
   readonly lastCheckedAt: number | null
   readonly responseMs: number | null
   readonly tlsDaysRemaining: number | null
-  readonly uptimePercent30d: number | null
+  readonly uptimePercent: number | null
 }
 
 function calculateUptimePercent(results: ReadonlyArray<{ status: string }>): number {
@@ -23,7 +24,8 @@ export class StatusHandler {
   constructor(
     private readonly monitorRepository: MonitorRepository,
     private readonly checkResultRepository: CheckResultRepository,
-    private readonly incidentRepository: IncidentRepository
+    private readonly incidentRepository: IncidentRepository,
+    private readonly defaultHistoryDays: number
   ) {}
 
   async handle(): Promise<Response> {
@@ -34,9 +36,11 @@ export class StatusHandler {
 
     const statuses = await Promise.all(
       monitorsResult.value.map(async (monitor): Promise<MonitorStatus> => {
+        const days = monitor.historyDays ?? this.defaultHistoryDays
+
         const [latestResult, historyResult] = await Promise.all([
           this.checkResultRepository.latestByMonitor(monitor.id),
-          this.checkResultRepository.listByMonitor(monitor.id, 30),
+          this.checkResultRepository.listByMonitor(monitor.id, days),
         ])
 
         const latest = latestResult.ok ? latestResult.value : null
@@ -46,11 +50,12 @@ export class StatusHandler {
           id: monitor.id,
           name: monitor.name,
           type: monitor.type,
+          historyDays: days,
           currentStatus: latest?.status ?? null,
           lastCheckedAt: latest?.checkedAt ?? null,
           responseMs: latest?.responseMs ?? null,
           tlsDaysRemaining: latest?.tlsDaysRemaining ?? null,
-          uptimePercent30d: calculateUptimePercent(history),
+          uptimePercent: calculateUptimePercent(history),
         }
       })
     )

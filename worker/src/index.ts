@@ -42,16 +42,20 @@ function buildServices(env: Env) {
     notificationSenderFactory
   )
 
+  const defaultHistoryDays = parseInt(env.HISTORY_DAYS, 10)
+
   const statusHandler = new StatusHandler(
     monitorRepository,
     checkResultRepository,
-    incidentRepository
+    incidentRepository,
+    defaultHistoryDays
   )
 
   const monitorDetailHandler = new MonitorDetailHandler(
     monitorRepository,
     checkResultRepository,
-    incidentRepository
+    incidentRepository,
+    defaultHistoryDays
   )
 
   return { monitorCheckService, statusHandler, monitorDetailHandler }

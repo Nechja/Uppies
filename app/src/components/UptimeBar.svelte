@@ -1,45 +1,100 @@
 <script lang="ts">
   import type { CheckResult } from '../lib/types.ts'
 
-  type Props = { history: ReadonlyArray<CheckResult>; days?: number }
-  let { history, days = 90 }: Props = $props()
+  type BucketRange = { start: number; end: number; label: string }
 
-  type DayBucket = { date: string; status: 'up' | 'degraded' | 'down' | 'empty' }
+  type Props = {
+    history: ReadonlyArray<CheckResult>
+    days?: number
+    onSelect?: (range: BucketRange) => void
+  }
 
-  function buildBuckets(
+  let { history, days = 90, onSelect }: Props = $props()
+
+  type Bucket = {
+    label: string
+    status: 'up' | 'degraded' | 'down' | 'empty'
+    start: number
+    end: number
+  }
+
+  const MS_PER_HOUR = 3_600_000
+  const MS_PER_DAY = 86_400_000
+
+  function resolveBucketStatus(
+    results: ReadonlyArray<CheckResult>
+  ): 'up' | 'degraded' | 'down' | 'empty' {
+    if (results.length === 0) return 'empty'
+    if (results.some((r) => r.status === 'down')) return 'down'
+    if (results.some((r) => r.status === 'degraded')) return 'degraded'
+    return 'up'
+  }
+
+  function buildDailyBuckets(
     results: ReadonlyArray<CheckResult>,
     bucketDays: number
-  ): ReadonlyArray<DayBucket> {
+  ): ReadonlyArray<Bucket> {
     const now = Date.now()
-    const msPerDay = 86_400_000
-
     return Array.from({ length: bucketDays }, (_, i) => {
-      const dayStart = now - (bucketDays - i) * msPerDay
-      const dayEnd = dayStart + msPerDay
-      const dayResults = results.filter(
-        (r) => r.checkedAt >= dayStart && r.checkedAt < dayEnd
-      )
-
-      if (dayResults.length === 0) return { date: new Date(dayStart).toDateString(), status: 'empty' }
-
-      const hasDown = dayResults.some((r) => r.status === 'down')
-      const hasDegraded = dayResults.some((r) => r.status === 'degraded')
-
-      const status = hasDown ? 'down' : hasDegraded ? 'degraded' : 'up'
-      return { date: new Date(dayStart).toDateString(), status }
+      const start = now - (bucketDays - i) * MS_PER_DAY
+      const end = start + MS_PER_DAY
+      const matches = results.filter((r) => r.checkedAt >= start && r.checkedAt < end)
+      return {
+        label: new Date(start).toLocaleDateString(),
+        status: resolveBucketStatus(matches),
+        start,
+        end,
+      }
     })
   }
 
+  function buildHourlyBuckets(
+    results: ReadonlyArray<CheckResult>,
+    hours: number
+  ): ReadonlyArray<Bucket> {
+    const now = Date.now()
+    return Array.from({ length: hours }, (_, i) => {
+      const start = now - (hours - i) * MS_PER_HOUR
+      const end = start + MS_PER_HOUR
+      const matches = results.filter((r) => r.checkedAt >= start && r.checkedAt < end)
+      return {
+        label: new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        status: resolveBucketStatus(matches),
+        start,
+        end,
+      }
+    })
+  }
+
+  function buildBuckets(
+    results: ReadonlyArray<CheckResult>,
+    viewDays: number
+  ): ReadonlyArray<Bucket> {
+    if (viewDays <= 2) return buildHourlyBuckets(results, viewDays * 24)
+    return buildDailyBuckets(results, viewDays)
+  }
+
   const buckets = $derived(buildBuckets(history, days))
+
+  let selectedLabel = $state<string | null>(null)
+
+  function handleClick(bucket: Bucket) {
+    if (bucket.status === 'empty') return
+    selectedLabel = selectedLabel === bucket.label ? null : bucket.label
+    onSelect?.({ start: bucket.start, end: bucket.end, label: bucket.label })
+  }
 </script>
 
 <div class="bar" role="img" aria-label="Uptime history">
-  {#each buckets as bucket (bucket.date)}
-    <span
+  {#each buckets as bucket (bucket.label)}
+    <button
       class="segment"
+      class:selected={selectedLabel === bucket.label}
+      class:clickable={bucket.status !== 'empty'}
       data-status={bucket.status}
-      title={`${bucket.date}: ${bucket.status}`}
-    ></span>
+      title={`${bucket.label}: ${bucket.status}`}
+      onclick={() => handleClick(bucket)}
+    ></button>
   {/each}
 </div>
 
@@ -55,11 +110,22 @@
     flex: 1;
     height: 100%;
     border-radius: 2px;
+    border: none;
+    padding: 0;
     transition: opacity var(--upp-transition-fast);
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 
   .segment:hover {
     opacity: 0.7;
+  }
+
+  .selected {
+    outline: 2px solid var(--upp-color-accent-primary);
+    outline-offset: 1px;
   }
 
   [data-status='up']       { background: var(--upp-color-status-up); }

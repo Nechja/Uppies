@@ -29,6 +29,7 @@ type RawMonitor = {
   interval_seconds?: number
   timeout_ms?: number
   tls_warn_days?: number
+  history_days?: number
   enabled?: boolean
   expect?: RawExpect
   notify?: ReadonlyArray<RawNotifyChannel>
@@ -66,7 +67,11 @@ function toConfigJson(monitor: RawMonitor): string {
     on: channel.on,
   }))
 
-  return JSON.stringify({ expect, notify })
+  return JSON.stringify({
+    ...(monitor.history_days !== undefined && { historyDays: monitor.history_days }),
+    expect,
+    notify,
+  })
 }
 
 function escape(value: string): string {

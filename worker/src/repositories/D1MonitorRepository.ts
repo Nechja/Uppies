@@ -40,6 +40,7 @@ function rowToMonitor(row: MonitorRow): Monitor {
     ...(row.url !== null && { url: row.url }),
     ...(row.host !== null && { host: row.host }),
     ...(row.port !== null && { port: row.port }),
+    ...(config.historyDays !== undefined && { historyDays: config.historyDays }),
     ...(config.expect !== undefined && { expect: config.expect }),
   }
 }

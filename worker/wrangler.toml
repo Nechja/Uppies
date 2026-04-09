@@ -8,6 +8,7 @@ SITE_TITLE = "Uppies"
 SITE_THEME = "cyberpunk"
 CACHE_TTL = "30"
 MAX_BODY_BYTES = "1048576"
+HISTORY_DAYS = "90"
 
 [assets]
 directory = "../app/dist"

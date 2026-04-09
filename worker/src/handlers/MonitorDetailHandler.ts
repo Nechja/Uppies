@@ -12,19 +12,22 @@ export class MonitorDetailHandler {
   constructor(
     private readonly monitorRepository: MonitorRepository,
     private readonly checkResultRepository: CheckResultRepository,
-    private readonly incidentRepository: IncidentRepository
+    private readonly incidentRepository: IncidentRepository,
+    private readonly defaultHistoryDays: number
   ) {}
 
   async handle(monitorId: string): Promise<Response> {
-    const [monitorResult, historyResult, incidentsResult] = await Promise.all([
-      this.monitorRepository.findById(monitorId),
-      this.checkResultRepository.listByMonitor(monitorId, 90),
-      this.incidentRepository.listByMonitor(monitorId),
-    ])
-
+    const monitorResult = await this.monitorRepository.findById(monitorId)
     if (!monitorResult.ok) {
       return Response.json({ error: 'Monitor not found' }, { status: 404 })
     }
+
+    const days = monitorResult.value.historyDays ?? this.defaultHistoryDays
+
+    const [historyResult, incidentsResult] = await Promise.all([
+      this.checkResultRepository.listByMonitor(monitorId, days),
+      this.incidentRepository.listByMonitor(monitorId),
+    ])
 
     const history = historyResult.ok ? historyResult.value : []
     const incidents = incidentsResult.ok ? incidentsResult.value : []
@@ -34,11 +37,12 @@ export class MonitorDetailHandler {
       id: monitorResult.value.id,
       name: monitorResult.value.name,
       type: monitorResult.value.type,
+      historyDays: days,
       currentStatus: latest?.status ?? null,
       lastCheckedAt: latest?.checkedAt ?? null,
       responseMs: latest?.responseMs ?? null,
       tlsDaysRemaining: latest?.tlsDaysRemaining ?? null,
-      uptimePercent30d: calculateUptimePercent(history),
+      uptimePercent: calculateUptimePercent(history),
     }
 
     return Response.json({ monitor, history, incidents })

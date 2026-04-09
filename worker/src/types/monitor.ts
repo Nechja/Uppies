@@ -28,6 +28,7 @@ export type Monitor = {
   readonly timeoutMs: number
   readonly tlsWarnDays: number
   readonly enabled: boolean
+  readonly historyDays?: number
   readonly expect?: HttpExpectation
   readonly notify: ReadonlyArray<NotifyChannel>
 }

@@ -66,4 +66,5 @@ jobs:
             --var SITE_TITLE:"${{ vars.SITE_TITLE || 'Uppies' }}" \
             --var SITE_THEME:"${{ vars.SITE_THEME || 'cyberpunk' }}" \
             --var CACHE_TTL:"${{ vars.CACHE_TTL || '30' }}" \
-            --var MAX_BODY_BYTES:"${{ vars.MAX_BODY_BYTES || '1048576' }}"
+            --var MAX_BODY_BYTES:"${{ vars.MAX_BODY_BYTES || '1048576' }}" \
+            --var HISTORY_DAYS:"${{ vars.HISTORY_DAYS || '90' }}"

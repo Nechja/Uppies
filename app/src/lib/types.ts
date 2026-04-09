@@ -4,11 +4,12 @@ export type MonitorSummary = {
   readonly id: string
   readonly name: string
   readonly type: string
+  readonly historyDays: number
   readonly currentStatus: CheckStatus
   readonly lastCheckedAt: number | null
   readonly responseMs: number | null
   readonly tlsDaysRemaining: number | null
-  readonly uptimePercent30d: number | null
+  readonly uptimePercent: number | null
 }
 
 export type CheckResult = {
