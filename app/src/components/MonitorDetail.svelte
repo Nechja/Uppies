@@ -249,6 +249,8 @@
 
   .table-wrap {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 360px;
     border-radius: var(--upp-radius-md);
     border: 1px solid var(--upp-color-border-subtle);
   }
@@ -269,6 +271,9 @@
     color: var(--upp-color-text-muted);
     background: var(--upp-color-bg-surface);
     border-bottom: 1px solid var(--upp-color-border-subtle);
+    position: sticky;
+    top: 0;
+    z-index: 1;
   }
 
   .log-table td {
