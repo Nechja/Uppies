@@ -100,7 +100,7 @@
       class:selected={selectedStart === bucket.start}
       class:clickable={bucket.status !== 'empty'}
       data-status={bucket.status}
-      title={`${bucket.label}: ${bucket.status}`}
+      title={bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}
       onclick={() => handleClick(bucket)}
     ></button>
   {/each}
