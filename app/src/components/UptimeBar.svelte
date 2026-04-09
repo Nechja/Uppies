@@ -132,8 +132,8 @@
   }
 
   .selected {
-    outline: 2px solid var(--upp-color-accent-primary);
-    outline-offset: 1px;
+    box-shadow: 0 0 0 2px var(--upp-color-accent-primary);
+    transform: scaleY(1.3);
   }
 
   [data-status='up']       { background: var(--upp-color-status-up); }
