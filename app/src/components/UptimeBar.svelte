@@ -84,11 +84,11 @@
 
   const buckets = $derived(buildBuckets(history, days))
 
-  let selectedLabel = $state<string | null>(null)
+  let selectedStart = $state<number | null>(null)
 
   function handleClick(bucket: Bucket) {
     if (bucket.status === 'empty') return
-    selectedLabel = selectedLabel === bucket.label ? null : bucket.label
+    selectedStart = selectedStart === bucket.start ? null : bucket.start
     onSelect?.({ start: bucket.start, end: bucket.end, label: bucket.label })
   }
 </script>
@@ -97,7 +97,7 @@
   {#each buckets as bucket (bucket.start)}
     <button
       class="segment"
-      class:selected={selectedLabel === bucket.label}
+      class:selected={selectedStart === bucket.start}
       class:clickable={bucket.status !== 'empty'}
       data-status={bucket.status}
       title={`${bucket.label}: ${bucket.status}`}
@@ -132,7 +132,7 @@
   }
 
   .selected {
-    opacity: 0.5;
+    filter: brightness(1.8);
   }
 
   [data-status='up']       { background: var(--upp-color-status-up); }
