@@ -37,17 +37,19 @@
     return Math.max(1, Math.min(spanDays + 1, maxDays))
   }
 
-  function buildDailyBuckets(
+  function buildFixedBuckets(
     results: ReadonlyArray<CheckResult>,
-    bucketDays: number
+    count: number,
+    intervalMs: number,
+    formatLabel: (d: Date) => string
   ): ReadonlyArray<Bucket> {
     const now = Date.now()
-    return Array.from({ length: bucketDays }, (_, i) => {
-      const start = now - (bucketDays - i) * MS_PER_DAY
-      const end = start + MS_PER_DAY
+    return Array.from({ length: count }, (_, i) => {
+      const start = now - (count - i) * intervalMs
+      const end = start + intervalMs
       const matches = results.filter((r) => r.checkedAt >= start && r.checkedAt < end)
       return {
-        label: new Date(start).toLocaleDateString(),
+        label: formatLabel(new Date(start)),
         status: resolveBucketStatus(matches),
         start,
         end,
@@ -55,22 +57,18 @@
     })
   }
 
-  function buildHourlyBuckets(
-    results: ReadonlyArray<CheckResult>,
-    hours: number
-  ): ReadonlyArray<Bucket> {
-    const now = Date.now()
-    return Array.from({ length: hours }, (_, i) => {
-      const start = now - (hours - i) * MS_PER_HOUR
-      const end = start + MS_PER_HOUR
-      const matches = results.filter((r) => r.checkedAt >= start && r.checkedAt < end)
-      return {
-        label: new Date(start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        status: resolveBucketStatus(matches),
-        start,
-        end,
-      }
-    })
+  const MS_PER_6H = MS_PER_HOUR * 6
+
+  function formatHour(d: Date): string {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
+  function formatBlock(d: Date): string {
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+  }
+
+  function formatDay(d: Date): string {
+    return d.toLocaleDateString()
   }
 
   function buildBuckets(
@@ -78,8 +76,9 @@
     viewDays: number
   ): ReadonlyArray<Bucket> {
     const span = effectiveDays(results, viewDays)
-    if (span <= 2) return buildHourlyBuckets(results, span * 24)
-    return buildDailyBuckets(results, span)
+    if (span <= 2) return buildFixedBuckets(results, span * 24, MS_PER_HOUR, formatHour)
+    if (span <= 7) return buildFixedBuckets(results, span * 4, MS_PER_6H, formatBlock)
+    return buildFixedBuckets(results, span, MS_PER_DAY, formatDay)
   }
 
   const buckets = $derived(buildBuckets(history, days))
