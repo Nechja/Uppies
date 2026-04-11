@@ -81,6 +81,10 @@ monitors:
     expect:
       status: 200
       max_ms: 50
+    notify:
+      - type: discord
+        url: $DISCORD_WEBHOOK_URL
+        on: [down, recover]
 
   - id: google-dns-tcp
     name: Google DNS Port
