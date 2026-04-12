@@ -1,27 +1,28 @@
 import type { MonitorSummary, MonitorDetail, SiteConfig } from './types.ts'
+import type { Result } from './result.ts'
+import { ok, err } from './result.ts'
 
 type ApiError = { readonly message: string }
-type ApiResult<T> = { readonly ok: true; readonly data: T } | { readonly ok: false; readonly error: ApiError }
 
-async function get<T>(path: string): Promise<ApiResult<T>> {
+async function get<T>(path: string): Promise<Result<T, ApiError>> {
   const response = await fetch(path)
 
   if (!response.ok) {
-    return { ok: false, error: { message: `HTTP ${response.status}` } }
+    return err({ message: `HTTP ${response.status}` })
   }
 
   const data = await response.json() as T
-  return { ok: true, data }
+  return ok(data)
 }
 
-export async function fetchConfig(): Promise<ApiResult<SiteConfig>> {
+export async function fetchConfig(): Promise<Result<SiteConfig, ApiError>> {
   return get('/api/config')
 }
 
-export async function fetchAllMonitors(): Promise<ApiResult<{ monitors: ReadonlyArray<MonitorSummary> }>> {
+export async function fetchAllMonitors(): Promise<Result<{ monitors: ReadonlyArray<MonitorSummary> }, ApiError>> {
   return get('/api/monitors')
 }
 
-export async function fetchMonitorDetail(id: string): Promise<ApiResult<MonitorDetail>> {
+export async function fetchMonitorDetail(id: string): Promise<Result<MonitorDetail, ApiError>> {
   return get(`/api/monitors/${id}`)
 }

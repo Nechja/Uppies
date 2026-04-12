@@ -29,7 +29,8 @@ export function openLiveConnection(callbacks: LiveCallbacks): () => void {
       try {
         const data = JSON.parse(event.data as string) as LiveMessage
         callbacks.onMonitors(data.monitors)
-      } catch {
+      } catch (e) {
+        console.warn('Failed to parse live message', e)
       }
     }
 

@@ -1,12 +1,8 @@
 import type { MonitorRepository } from '../repositories/MonitorRepository.ts'
 import type { CheckResultRepository } from '../repositories/CheckResultRepository.ts'
 import type { IncidentRepository } from '../repositories/IncidentRepository.ts'
-
-function calculateUptimePercent(results: ReadonlyArray<{ status: string }>): number {
-  if (results.length === 0) return 100
-  const upCount = results.filter((r) => r.status === 'up').length
-  return Math.round((upCount / results.length) * 1000) / 10
-}
+import { unwrapOr } from '../result.ts'
+import { calculateUptimePercent } from '../uptime.ts'
 
 export class MonitorDetailHandler {
   constructor(
@@ -29,8 +25,8 @@ export class MonitorDetailHandler {
       this.incidentRepository.listByMonitor(monitorId),
     ])
 
-    const history = historyResult.ok ? historyResult.value : []
-    const incidents = incidentsResult.ok ? incidentsResult.value : []
+    const history = unwrapOr(historyResult, [])
+    const incidents = unwrapOr(incidentsResult, [])
     const latest = history[0] ?? null
 
     const monitor = {

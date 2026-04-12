@@ -39,7 +39,7 @@
     state = { type: 'loading' }
     const result = await fetchMonitorDetail(monitorId)
     state = result.ok
-      ? { type: 'loaded', detail: result.data }
+      ? { type: 'loaded', detail: result.value }
       : { type: 'error', message: result.error.message }
   }
 

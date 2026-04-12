@@ -14,12 +14,12 @@
   let monitors = $state<ReadonlyArray<MonitorSummary> | null>(null)
   let liveConnected = $state(false)
 
-  const overallStatus = $derived<CheckStatus>((() => {
+  const overallStatus = $derived.by<CheckStatus>(() => {
     if (monitors === null || monitors.length === 0) return 'unknown'
     if (monitors.some((m) => m.currentStatus === 'down')) return 'down'
     if (monitors.some((m) => m.currentStatus === 'degraded')) return 'degraded'
     return 'up'
-  })())
+  })
 
   const statusLabel: Record<CheckStatus, string> = {
     up: 'All systems operational',
@@ -51,15 +51,15 @@
     ])
 
     if (configResult.ok) {
-      siteTitle = configResult.data.title
-      document.title = configResult.data.title
-      if (isValidTheme(configResult.data.theme)) {
-        applyTheme(configResult.data.theme)
+      siteTitle = configResult.value.title
+      document.title = configResult.value.title
+      if (isValidTheme(configResult.value.theme)) {
+        applyTheme(configResult.value.theme)
       }
     }
 
     if (monitorsResult.ok) {
-      monitors = monitorsResult.data.monitors
+      monitors = monitorsResult.value.monitors
     }
 
     const disconnect = openLiveConnection({

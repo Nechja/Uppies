@@ -1,6 +1,8 @@
 import type { MonitorRepository } from '../repositories/MonitorRepository.ts'
 import type { CheckResultRepository } from '../repositories/CheckResultRepository.ts'
 import type { IncidentRepository } from '../repositories/IncidentRepository.ts'
+import { unwrapOr } from '../result.ts'
+import { calculateUptimePercent } from '../uptime.ts'
 
 type MonitorStatus = {
   readonly id: string
@@ -12,12 +14,6 @@ type MonitorStatus = {
   readonly responseMs: number | null
   readonly tlsDaysRemaining: number | null
   readonly uptimePercent: number | null
-}
-
-function calculateUptimePercent(results: ReadonlyArray<{ status: string }>): number {
-  if (results.length === 0) return 100
-  const upCount = results.filter((r) => r.status === 'up').length
-  return Math.round((upCount / results.length) * 1000) / 10
 }
 
 export class StatusHandler {
@@ -43,8 +39,8 @@ export class StatusHandler {
           this.checkResultRepository.listByMonitor(monitor.id, days),
         ])
 
-        const latest = latestResult.ok ? latestResult.value : null
-        const history = historyResult.ok ? historyResult.value : []
+        const latest = unwrapOr(latestResult, null)
+        const history = unwrapOr(historyResult, [])
 
         return {
           id: monitor.id,
