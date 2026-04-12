@@ -5,7 +5,7 @@
   import ThemeSwitcher from './components/ThemeSwitcher.svelte'
   import { fetchConfig, fetchAllMonitors } from './lib/api.ts'
   import { openLiveConnection } from './lib/live.ts'
-  import { applyTheme } from './lib/theme.ts'
+  import { applyTheme, getSavedTheme } from './lib/theme.ts'
   import type { MonitorSummary, Theme, CheckStatus } from './lib/types.ts'
 
   type View = { type: 'overview' } | { type: 'detail'; monitorId: string }
@@ -56,9 +56,8 @@
       siteTitle = configResult.value.title
       document.title = configResult.value.title
       availableThemes = configResult.value.themes.filter(isValidTheme)
-      if (isValidTheme(configResult.value.theme)) {
-        applyTheme(configResult.value.theme)
-      }
+      const theme = getSavedTheme(availableThemes, configResult.value.theme)
+      applyTheme(theme)
     }
 
     if (monitorsResult.ok) {
