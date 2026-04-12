@@ -106,7 +106,10 @@ export default {
     const url = new URL(request.url)
 
     if (url.pathname === '/api/config') {
-      return Response.json({ title: env.SITE_TITLE, theme: env.SITE_THEME })
+      const themes = env.SITE_THEMES
+        ? env.SITE_THEMES.split(',').map((t) => t.trim()).filter((t) => t.length > 0)
+        : [env.SITE_THEME]
+      return Response.json({ title: env.SITE_TITLE, theme: env.SITE_THEME, themes })
     }
 
     if (url.pathname === '/api/live') {

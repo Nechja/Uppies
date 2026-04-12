@@ -12,6 +12,7 @@
 
   let view = $state<View>({ type: 'overview' })
   let siteTitle = $state('Uppies')
+  let availableThemes = $state<ReadonlyArray<string>>([])
   let monitors = $state<ReadonlyArray<MonitorSummary> | null>(null)
   let liveConnected = $state(false)
 
@@ -54,6 +55,7 @@
     if (configResult.ok) {
       siteTitle = configResult.value.title
       document.title = configResult.value.title
+      availableThemes = configResult.value.themes.filter(isValidTheme)
       if (isValidTheme(configResult.value.theme)) {
         applyTheme(configResult.value.theme)
       }
@@ -98,7 +100,9 @@
         <span class="status-dot"></span>
         <span class="status-label">{statusLabel[overallStatus]}</span>
       </div>
-      <ThemeSwitcher />
+      {#if availableThemes.length > 1}
+        <ThemeSwitcher themes={availableThemes} />
+      {/if}
     </div>
   </header>
 
@@ -111,6 +115,9 @@
   </main>
 
   <footer class="site-footer">
+    <a class="footer-link" href="https://github.com/Nechja/Uppies" target="_blank" rel="noopener">
+      Powered by Uppies
+    </a>
     <span class="footer-connection" class:connected={liveConnected}>
       {liveConnected ? 'Live' : 'Reconnecting'}
     </span>
@@ -207,8 +214,20 @@
     padding: var(--upp-spacing-3) var(--upp-spacing-8);
     border-top: 1px solid var(--upp-color-border-subtle);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     font-family: var(--upp-font-family-ui);
+  }
+
+  .footer-link {
+    font-size: var(--upp-font-size-xs);
+    color: var(--upp-color-text-muted);
+    text-decoration: none;
+    transition: color var(--upp-transition-fast);
+  }
+
+  .footer-link:hover {
+    color: var(--upp-color-accent-primary);
   }
 
   .footer-connection {

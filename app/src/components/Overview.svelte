@@ -69,17 +69,11 @@
     border: 1px solid var(--upp-color-border-subtle);
     border-radius: var(--upp-radius-md);
     overflow: hidden;
-    transition: border-color var(--upp-transition-fast), transform var(--upp-transition-fast);
-    border-left: 3px solid var(--upp-color-status-unknown);
+    transition: border-color var(--upp-transition-fast);
   }
-
-  .monitor-row[data-status='up']       { border-left-color: var(--upp-color-status-up); }
-  .monitor-row[data-status='degraded'] { border-left-color: var(--upp-color-status-degraded); }
-  .monitor-row[data-status='down']     { border-left-color: var(--upp-color-status-down); }
 
   .monitor-row:hover {
     border-color: var(--upp-color-border-default);
-    transform: translateX(2px);
   }
 
   .monitor-button {

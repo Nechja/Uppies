@@ -67,4 +67,5 @@ jobs:
             --var SITE_THEME:"${{ vars.SITE_THEME || 'cyberpunk' }}" \
             --var CACHE_TTL:"${{ vars.CACHE_TTL || '30' }}" \
             --var MAX_BODY_BYTES:"${{ vars.MAX_BODY_BYTES || '1048576' }}" \
-            --var HISTORY_DAYS:"${{ vars.HISTORY_DAYS || '90' }}"
+            --var HISTORY_DAYS:"${{ vars.HISTORY_DAYS || '90' }}" \
+            --var SITE_THEMES:"${{ vars.SITE_THEMES || 'cyberpunk,terminal,clean-dark,light,corporate' }}"

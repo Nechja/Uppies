@@ -41,4 +41,5 @@ export type Theme = 'cyberpunk' | 'terminal' | 'clean-dark' | 'light' | 'corpora
 export type SiteConfig = {
   readonly title: string
   readonly theme: Theme
+  readonly themes: ReadonlyArray<string>
 }
