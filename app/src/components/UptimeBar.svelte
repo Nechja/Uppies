@@ -123,18 +123,18 @@
   .bar {
     display: flex;
     gap: 2px;
-    align-items: flex-end;
-    height: 32px;
+    align-items: stretch;
+    height: 40px;
+    padding: var(--upp-spacing-2) 0;
   }
 
   .segment {
     flex: 1;
-    height: 100%;
-    border-radius: 2px;
+    border-radius: 3px;
     border: none;
     padding: 0;
     position: relative;
-    transition: opacity var(--upp-transition-fast);
+    transition: filter var(--upp-transition-fast), transform var(--upp-transition-fast);
   }
 
   .clickable {
@@ -142,33 +142,37 @@
   }
 
   .segment:hover {
-    opacity: 0.7;
+    filter: brightness(1.3);
+    transform: scaleY(1.15);
   }
 
   .selected {
     filter: brightness(1.8);
+    transform: scaleY(1.25);
   }
 
   [data-status='up']       { background: var(--upp-color-status-up); }
   [data-status='degraded'] { background: var(--upp-color-status-degraded); }
   [data-status='down']     { background: var(--upp-color-status-down); }
-  [data-status='empty']    { background: var(--upp-color-border-subtle); }
+  [data-status='empty']    { background: var(--upp-color-border-subtle); opacity: 0.5; }
 
   .tooltip {
     display: none;
     position: absolute;
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--upp-color-bg-surface);
-    border: 1px solid var(--upp-color-border-subtle);
+    background: var(--upp-color-bg-raised);
+    border: 1px solid var(--upp-color-border-default);
     color: var(--upp-color-text-primary);
+    font-family: var(--upp-font-family-ui);
     font-size: var(--upp-font-size-xs);
-    padding: var(--upp-spacing-1) var(--upp-spacing-2);
+    padding: var(--upp-spacing-1) var(--upp-spacing-3);
     border-radius: var(--upp-radius-sm);
     white-space: nowrap;
     pointer-events: none;
     z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
   .segment:hover .tooltip {

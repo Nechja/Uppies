@@ -17,18 +17,30 @@
 {:else}
   <ul class="monitor-list">
     {#each monitors as monitor (monitor.id)}
-      <li class="monitor-row">
+      <li class="monitor-row" data-status={monitor.currentStatus ?? 'unknown'}>
         <button class="monitor-button" onclick={() => onSelectMonitor(monitor.id)}>
-          <span class="monitor-name">{monitor.name}</span>
+          <div class="monitor-info">
+            <span class="monitor-name">{monitor.name}</span>
+            <span class="monitor-type">{monitor.type}</span>
+          </div>
           <span class="monitor-meta">
             {#if monitor.uptimePercent !== null}
-              <span class="meta-item">{monitor.uptimePercent}%</span>
+              <span class="meta-item">
+                <span class="meta-value">{monitor.uptimePercent}%</span>
+                <span class="meta-label">uptime</span>
+              </span>
             {/if}
             {#if monitor.responseMs !== null}
-              <span class="meta-item">{monitor.responseMs}ms</span>
+              <span class="meta-item">
+                <span class="meta-value">{monitor.responseMs}ms</span>
+                <span class="meta-label">latency</span>
+              </span>
             {/if}
             {#if monitor.tlsDaysRemaining !== null}
-              <span class="meta-item">TLS {monitor.tlsDaysRemaining}d</span>
+              <span class="meta-item">
+                <span class="meta-value">{monitor.tlsDaysRemaining}d</span>
+                <span class="meta-label">TLS</span>
+              </span>
             {/if}
           </span>
           <StatusBadge status={monitor.currentStatus ?? 'unknown'} />
@@ -57,11 +69,17 @@
     border: 1px solid var(--upp-color-border-subtle);
     border-radius: var(--upp-radius-md);
     overflow: hidden;
-    transition: border-color var(--upp-transition-fast);
+    transition: border-color var(--upp-transition-fast), transform var(--upp-transition-fast);
+    border-left: 3px solid var(--upp-color-status-unknown);
   }
+
+  .monitor-row[data-status='up']       { border-left-color: var(--upp-color-status-up); }
+  .monitor-row[data-status='degraded'] { border-left-color: var(--upp-color-status-degraded); }
+  .monitor-row[data-status='down']     { border-left-color: var(--upp-color-status-down); }
 
   .monitor-row:hover {
     border-color: var(--upp-color-border-default);
+    transform: translateX(2px);
   }
 
   .monitor-button {
@@ -83,16 +101,50 @@
     background: var(--upp-color-bg-raised);
   }
 
-  .monitor-name {
+  .monitor-info {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .monitor-name {
     font-size: var(--upp-font-size-md);
     font-weight: var(--upp-font-weight-medium);
   }
 
+  .monitor-type {
+    font-size: var(--upp-font-size-xs);
+    color: var(--upp-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
   .monitor-meta {
     display: flex;
-    gap: var(--upp-spacing-4);
-    color: var(--upp-color-text-secondary);
+    gap: var(--upp-spacing-6);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+
+  .meta-value {
     font-size: var(--upp-font-size-sm);
+    font-weight: var(--upp-font-weight-medium);
+    color: var(--upp-color-text-primary);
+    font-variant-numeric: tabular-nums;
+    font-family: var(--upp-font-family-ui);
+  }
+
+  .meta-label {
+    font-size: 9px;
+    color: var(--upp-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--upp-font-family-ui);
   }
 </style>

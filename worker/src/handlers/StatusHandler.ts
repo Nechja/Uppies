@@ -1,6 +1,5 @@
 import type { MonitorRepository } from '../repositories/MonitorRepository.ts'
 import type { CheckResultRepository } from '../repositories/CheckResultRepository.ts'
-import type { IncidentRepository } from '../repositories/IncidentRepository.ts'
 import { unwrapOr } from '../result.ts'
 import { calculateUptimePercent } from '../uptime.ts'
 
@@ -20,7 +19,6 @@ export class StatusHandler {
   constructor(
     private readonly monitorRepository: MonitorRepository,
     private readonly checkResultRepository: CheckResultRepository,
-    private readonly incidentRepository: IncidentRepository,
     private readonly defaultHistoryDays: number
   ) {}
 

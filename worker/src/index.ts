@@ -7,6 +7,8 @@ import { HttpCheckRunner } from './checks/HttpCheckRunner.ts'
 import { TlsCheckRunner } from './checks/TlsCheckRunner.ts'
 import { TcpCheckRunner } from './checks/TcpCheckRunner.ts'
 import { CheckRunnerRegistry } from './checks/CheckRunnerRegistry.ts'
+import { DiscordNotificationSender } from './notifications/DiscordNotificationSender.ts'
+import { WebhookNotificationSender } from './notifications/WebhookNotificationSender.ts'
 import { EnvNotificationSenderFactory } from './notifications/EnvNotificationSenderFactory.ts'
 import { IncidentService } from './services/IncidentService.ts'
 import { MonitorCheckService } from './services/MonitorCheckService.ts'
@@ -21,6 +23,7 @@ function buildServices(env: Env) {
   const incidentRepository = new D1IncidentRepository(env.DB)
 
   const maxBodyBytes = parseInt(env.MAX_BODY_BYTES, 10)
+  const defaultHistoryDays = parseInt(env.HISTORY_DAYS, 10)
 
   const checkRunnerRegistry = new CheckRunnerRegistry([
     new HttpCheckRunner(maxBodyBytes),
@@ -28,8 +31,19 @@ function buildServices(env: Env) {
     new TcpCheckRunner(),
   ])
 
+  const envRecord = env as unknown as Record<string, unknown>
+  const resolveUrl = (raw: string): string | null => {
+    if (!raw.startsWith('$')) return raw
+    const value = envRecord[raw.slice(1)]
+    return typeof value === 'string' && value.length > 0 ? value : null
+  }
+
   const notificationSenderFactory = new EnvNotificationSenderFactory(
-    env as unknown as Record<string, unknown>
+    resolveUrl,
+    new Map([
+      ['discord', (url: string) => new DiscordNotificationSender(url)],
+      ['webhook', (url: string) => new WebhookNotificationSender(url)],
+    ])
   )
 
   const incidentService = new IncidentService(incidentRepository)
@@ -42,12 +56,9 @@ function buildServices(env: Env) {
     notificationSenderFactory
   )
 
-  const defaultHistoryDays = parseInt(env.HISTORY_DAYS, 10)
-
   const statusHandler = new StatusHandler(
     monitorRepository,
     checkResultRepository,
-    incidentRepository,
     defaultHistoryDays
   )
 
@@ -98,13 +109,6 @@ export default {
       return Response.json({ title: env.SITE_TITLE, theme: env.SITE_THEME })
     }
 
-    if (url.pathname === '/api/monitors') {
-      return cachedJson(request, env, async () => {
-        const { statusHandler } = buildServices(env)
-        return statusHandler.handle()
-      })
-    }
-
     if (url.pathname === '/api/live') {
       const hub = globalHub(env)
       return hub.fetch('http://internal/connect', {
@@ -112,12 +116,17 @@ export default {
       })
     }
 
+    const services = buildServices(env)
+
+    if (url.pathname === '/api/monitors') {
+      return cachedJson(request, env, () => services.statusHandler.handle())
+    }
+
     const monitorMatch = monitorIdPattern.exec(url.pathname)
     if (monitorMatch !== null && monitorMatch[1] !== undefined) {
-      return cachedJson(request, env, async () => {
-        const { monitorDetailHandler } = buildServices(env)
-        return monitorDetailHandler.handle(monitorMatch[1])
-      })
+      return cachedJson(request, env, () =>
+        services.monitorDetailHandler.handle(monitorMatch[1])
+      )
     }
 
     return env.ASSETS.fetch(request)

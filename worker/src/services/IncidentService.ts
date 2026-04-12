@@ -4,8 +4,9 @@ import type { Monitor } from '../types/monitor.ts'
 import type { NotificationSender, NotificationPayload } from '../notifications/NotificationSender.ts'
 import type { Result } from '../result.ts'
 import { ok } from '../result.ts'
+import type { OutcomeHandler } from './OutcomeHandler.ts'
 
-export class IncidentService {
+export class IncidentService implements OutcomeHandler {
   constructor(private readonly incidentRepository: IncidentRepository) {}
 
   async handleOutcome(

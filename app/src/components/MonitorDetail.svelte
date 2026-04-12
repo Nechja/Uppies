@@ -186,18 +186,20 @@
     background: none;
     border: 1px solid var(--upp-color-border-subtle);
     color: var(--upp-color-text-secondary);
-    font-family: inherit;
+    font-family: var(--upp-font-family-ui);
     font-size: var(--upp-font-size-sm);
     padding: var(--upp-spacing-2) var(--upp-spacing-4);
     border-radius: var(--upp-radius-sm);
     cursor: pointer;
     align-self: flex-start;
     transition: all var(--upp-transition-fast);
+    letter-spacing: 0.02em;
   }
 
   .back:hover {
     border-color: var(--upp-color-accent-primary);
     color: var(--upp-color-accent-primary);
+    transform: translateX(-2px);
   }
 
   .header {
@@ -239,6 +241,8 @@
     font-size: var(--upp-font-size-xl);
     font-weight: var(--upp-font-weight-bold);
     color: var(--upp-color-text-primary);
+    font-variant-numeric: tabular-nums;
+    font-family: var(--upp-font-family-ui);
   }
 
   .section {
@@ -291,6 +295,10 @@
   .log-table td {
     padding: var(--upp-spacing-2) var(--upp-spacing-4);
     border-bottom: 1px solid var(--upp-color-border-subtle);
+  }
+
+  .log-table tbody tr:nth-child(even) {
+    background: var(--upp-color-bg-raised);
   }
 
   .log-table tbody tr:last-child td {

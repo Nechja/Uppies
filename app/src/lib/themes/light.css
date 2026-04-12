@@ -1,51 +1,22 @@
-/**
- * Do not edit directly, this file was auto-generated.
- */
-
 [data-theme="light"] {
-  --upp-spacing-1: 4px;
-  --upp-spacing-2: 8px;
-  --upp-spacing-3: 12px;
-  --upp-spacing-4: 16px;
-  --upp-spacing-6: 24px;
-  --upp-spacing-8: 32px;
-  --upp-spacing-12: 48px;
-  --upp-spacing-16: 64px;
-  --upp-radius-sm: 4px;
-  --upp-radius-md: 8px;
-  --upp-radius-lg: 12px;
-  --upp-radius-full: 9999px;
-  --upp-font-size-xs: 11px;
-  --upp-font-size-sm: 13px;
-  --upp-font-size-md: 15px;
-  --upp-font-size-lg: 18px;
-  --upp-font-size-xl: 24px;
-  --upp-font-size-2xl: 32px;
-  --upp-font-size-3xl: 48px;
-  --upp-font-weight-normal: 400;
-  --upp-font-weight-medium: 500;
-  --upp-font-weight-bold: 700;
-  --upp-font-family-base: 'Inter', system-ui, sans-serif;
-  --upp-font-family-ui: 'Inter', system-ui, sans-serif;
-  --upp-transition-fast: 120ms ease;
-  --upp-transition-base: 200ms ease;
-  --upp-color-bg-base: #f7f5f0;
+  --upp-font-family-base: 'Source Serif 4', Georgia, serif;
+  --upp-font-family-ui: 'DM Sans', system-ui, sans-serif;
+  --upp-color-bg-base: #f5f3ee;
   --upp-color-bg-surface: #ffffff;
-  --upp-color-bg-raised: #f0ede8;
-  --upp-color-border-subtle: #e8e4de;
-  --upp-color-border-default: #d4cfc8;
-  --upp-color-border-bright: #b0a898;
-  --upp-color-text-primary: #1a1814;
-  --upp-color-text-secondary: #5a5650;
-  --upp-color-text-muted: #9a9690;
+  --upp-color-bg-raised: #edeae4;
+  --upp-color-border-subtle: #e0dcd5;
+  --upp-color-border-default: #ccc7be;
+  --upp-color-border-bright: #a8a198;
+  --upp-color-text-primary: #1c1917;
+  --upp-color-text-secondary: #57534e;
+  --upp-color-text-muted: #a8a29e;
   --upp-color-status-up: #16a34a;
-  --upp-color-status-degraded: #d97706;
+  --upp-color-status-degraded: #ca8a04;
   --upp-color-status-down: #dc2626;
   --upp-color-status-unknown: #94a3b8;
-  --upp-color-accent-primary: #2563eb;
+  --upp-color-accent-primary: #1d4ed8;
   --upp-color-accent-secondary: #7c3aed;
-  --upp-color-accent-glow: rgba(37,99,235,0.08);
+  --upp-color-accent-glow: rgba(29, 78, 216, 0.06);
   --upp-effect-glow-status: none;
   --upp-effect-glow-accent: none;
-  --upp-effect-scanlines: 0;
 }

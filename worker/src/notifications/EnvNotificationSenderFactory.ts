@@ -1,13 +1,17 @@
 import type { Monitor, NotifyChannel, NotifyEvent } from '../types/monitor.ts'
 import type { NotificationSender } from './NotificationSender.ts'
 import type { NotificationSenderFactory } from './NotificationSenderFactory.ts'
-import { DiscordNotificationSender } from './DiscordNotificationSender.ts'
-import { WebhookNotificationSender } from './WebhookNotificationSender.ts'
 import { EventFilteredNotificationSender } from './EventFilteredNotificationSender.ts'
 import { CompositeNotificationSender } from './CompositeNotificationSender.ts'
 
+export type SenderConstructor = (url: string) => NotificationSender
+export type UrlResolver = (raw: string) => string | null
+
 export class EnvNotificationSenderFactory implements NotificationSenderFactory {
-  constructor(private readonly env: Record<string, unknown>) {}
+  constructor(
+    private readonly resolveUrl: UrlResolver,
+    private readonly senderTypes: ReadonlyMap<string, SenderConstructor>
+  ) {}
 
   buildForMonitor(monitor: Monitor): NotificationSender {
     const senders = monitor.notify
@@ -21,18 +25,12 @@ export class EnvNotificationSenderFactory implements NotificationSenderFactory {
     const url = this.resolveUrl(channel.url)
     if (url === null) return null
 
-    const inner = channel.type === 'discord'
-      ? new DiscordNotificationSender(url)
-      : new WebhookNotificationSender(url)
+    const create = this.senderTypes.get(channel.type)
+    if (create === undefined) return null
 
-    return new EventFilteredNotificationSender(inner, channel.on as ReadonlyArray<NotifyEvent>)
-  }
-
-  private resolveUrl(rawUrl: string): string | null {
-    if (!rawUrl.startsWith('$')) return rawUrl
-    const varName = rawUrl.slice(1)
-    const value = this.env[varName]
-    if (typeof value !== 'string' || value.length === 0) return null
-    return value
+    return new EventFilteredNotificationSender(
+      create(url),
+      channel.on as ReadonlyArray<NotifyEvent>
+    )
   }
 }

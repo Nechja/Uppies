@@ -2,6 +2,7 @@
   import { onMount } from 'svelte'
   import Overview from './components/Overview.svelte'
   import MonitorDetail from './components/MonitorDetail.svelte'
+  import ThemeSwitcher from './components/ThemeSwitcher.svelte'
   import { fetchConfig, fetchAllMonitors } from './lib/api.ts'
   import { openLiveConnection } from './lib/live.ts'
   import { applyTheme } from './lib/theme.ts'
@@ -92,9 +93,12 @@
 <div class="layout">
   <header class="site-header">
     <button class="wordmark" onclick={navigateToOverview}>{siteTitle}</button>
-    <div class="status-bar" data-status={overallStatus}>
-      <span class="status-dot"></span>
-      <span class="status-label">{statusLabel[overallStatus]}</span>
+    <div class="header-right">
+      <div class="status-bar" data-status={overallStatus}>
+        <span class="status-dot"></span>
+        <span class="status-label">{statusLabel[overallStatus]}</span>
+      </div>
+      <ThemeSwitcher />
     </div>
   </header>
 
@@ -105,11 +109,19 @@
       <MonitorDetail monitorId={view.monitorId} onBack={navigateToOverview} />
     {/if}
   </main>
+
+  <footer class="site-footer">
+    <span class="footer-connection" class:connected={liveConnected}>
+      {liveConnected ? 'Live' : 'Reconnecting'}
+    </span>
+  </footer>
 </div>
 
 <style>
   .layout {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     background: var(--upp-color-bg-base);
     color: var(--upp-color-text-primary);
     font-family: var(--upp-font-family-base);
@@ -121,18 +133,26 @@
     justify-content: space-between;
     padding: var(--upp-spacing-4) var(--upp-spacing-8);
     border-bottom: 1px solid var(--upp-color-border-subtle);
+    gap: var(--upp-spacing-4);
+    flex-wrap: wrap;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--upp-spacing-6);
   }
 
   .wordmark {
     background: none;
     border: none;
     color: var(--upp-color-accent-primary);
-    font-family: inherit;
+    font-family: var(--upp-font-family-ui);
     font-size: var(--upp-font-size-lg);
     font-weight: var(--upp-font-weight-bold);
     cursor: pointer;
     padding: 0;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
@@ -141,6 +161,7 @@
     align-items: center;
     gap: var(--upp-spacing-2);
     font-size: var(--upp-font-size-sm);
+    font-family: var(--upp-font-family-ui);
   }
 
   .status-dot {
@@ -150,19 +171,63 @@
     flex-shrink: 0;
   }
 
-  [data-status='up'] .status-dot    { background: var(--upp-color-status-up); box-shadow: var(--upp-effect-glow-status); }
-  [data-status='degraded'] .status-dot { background: var(--upp-color-status-degraded); }
-  [data-status='down'] .status-dot  { background: var(--upp-color-status-down); box-shadow: var(--upp-effect-glow-status); }
-  [data-status='unknown'] .status-dot  { background: var(--upp-color-status-unknown); }
+  [data-status='up'] .status-dot {
+    background: var(--upp-color-status-up);
+    box-shadow: var(--upp-effect-glow-status);
+    animation: glow-pulse 2.5s ease-in-out infinite;
+  }
+  [data-status='degraded'] .status-dot {
+    background: var(--upp-color-status-degraded);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  [data-status='down'] .status-dot {
+    background: var(--upp-color-status-down);
+    box-shadow: var(--upp-effect-glow-status);
+    animation: pulse 1s ease-in-out infinite;
+  }
+  [data-status='unknown'] .status-dot {
+    background: var(--upp-color-status-unknown);
+    animation: pulse 2s ease-in-out infinite;
+  }
 
-  [data-status='up'] .status-label     { color: var(--upp-color-status-up); }
-  [data-status='degraded'] .status-label { color: var(--upp-color-status-degraded); }
-  [data-status='down'] .status-label   { color: var(--upp-color-status-down); }
-  [data-status='unknown'] .status-label  { color: var(--upp-color-text-muted); }
+  [data-status='up'] .status-label       { color: var(--upp-color-status-up); }
+  [data-status='degraded'] .status-label  { color: var(--upp-color-status-degraded); }
+  [data-status='down'] .status-label      { color: var(--upp-color-status-down); }
+  [data-status='unknown'] .status-label   { color: var(--upp-color-text-muted); }
 
   .content {
+    flex: 1;
     max-width: 1100px;
+    width: 100%;
     margin: 0 auto;
     padding: var(--upp-spacing-8);
+  }
+
+  .site-footer {
+    padding: var(--upp-spacing-3) var(--upp-spacing-8);
+    border-top: 1px solid var(--upp-color-border-subtle);
+    display: flex;
+    justify-content: flex-end;
+    font-family: var(--upp-font-family-ui);
+  }
+
+  .footer-connection {
+    font-size: var(--upp-font-size-xs);
+    color: var(--upp-color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--upp-spacing-2);
+  }
+
+  .footer-connection::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--upp-color-status-down);
+  }
+
+  .footer-connection.connected::before {
+    background: var(--upp-color-status-up);
   }
 </style>

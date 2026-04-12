@@ -3,8 +3,9 @@ import type { CheckOutcome, CheckError } from '../types/check.ts'
 import type { Result } from '../result.ts'
 import { err } from '../result.ts'
 import type { CheckRunner } from './CheckRunner.ts'
+import type { CheckDispatcher } from './CheckDispatcher.ts'
 
-export class CheckRunnerRegistry {
+export class CheckRunnerRegistry implements CheckDispatcher {
   private readonly runners: ReadonlyMap<Monitor['type'], CheckRunner>
 
   constructor(runners: ReadonlyArray<CheckRunner>) {
