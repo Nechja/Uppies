@@ -126,7 +126,10 @@
 
     {#if selectedRange !== null}
       <section class="section">
-        <h2 class="section-title">Checks for {selectedRange.label}</h2>
+        <div class="section-header">
+          <h2 class="section-title">Checks for {selectedRange.label}</h2>
+          <button class="close-btn" onclick={() => { selectedRange = null }} aria-label="Close">x</button>
+        </div>
         {#if selectedLogs.length === 0}
           <p class="message">No checks recorded for this period.</p>
         {:else}
@@ -287,6 +290,34 @@
     letter-spacing: 0.1em;
     color: var(--upp-color-text-muted);
     font-family: var(--upp-font-family-ui);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .close-btn {
+    background: none;
+    border: 1px solid var(--upp-color-border-subtle);
+    color: var(--upp-color-text-muted);
+    font-family: var(--upp-font-family-ui);
+    font-size: var(--upp-font-size-xs);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--upp-radius-sm);
+    cursor: pointer;
+    transition: all var(--upp-transition-fast);
+    line-height: 1;
+  }
+
+  .close-btn:hover {
+    border-color: var(--upp-color-accent-primary);
+    color: var(--upp-color-accent-primary);
   }
 
   .message { color: var(--upp-color-text-secondary); font-size: var(--upp-font-size-sm); }
