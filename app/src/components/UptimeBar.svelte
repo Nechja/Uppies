@@ -30,10 +30,15 @@
     return 'up'
   }
 
+  function earliestTimestamp(results: ReadonlyArray<CheckResult>): number {
+    let min = Infinity
+    for (const r of results) if (r.checkedAt < min) min = r.checkedAt
+    return min
+  }
+
   function effectiveDays(results: ReadonlyArray<CheckResult>, maxDays: number): number {
     if (results.length === 0) return 1
-    const earliest = Math.min(...results.map((r) => r.checkedAt))
-    const spanDays = Math.ceil((Date.now() - earliest) / MS_PER_DAY)
+    const spanDays = Math.ceil((Date.now() - earliestTimestamp(results)) / MS_PER_DAY)
     return Math.max(1, Math.min(spanDays + 1, maxDays))
   }
 
@@ -44,10 +49,16 @@
     formatLabel: (d: Date) => string
   ): ReadonlyArray<Bucket> {
     const now = Date.now()
+    const sorted = [...results].sort((a, b) => a.checkedAt - b.checkedAt)
+    let cursor = 0
     return Array.from({ length: count }, (_, i) => {
       const start = now - (count - i) * intervalMs
       const end = start + intervalMs
-      const matches = results.filter((r) => r.checkedAt >= start && r.checkedAt < end)
+      while (cursor < sorted.length && sorted[cursor].checkedAt < start) cursor++
+      const matches: Array<CheckResult> = []
+      for (let j = cursor; j < sorted.length && sorted[j].checkedAt < end; j++) {
+        matches.push(sorted[j])
+      }
       return {
         label: formatLabel(new Date(start)),
         status: resolveBucketStatus(matches),
@@ -94,15 +105,16 @@
 
 <div class="bar" role="img" aria-label="Uptime history">
   {#each buckets as bucket (bucket.start)}
+    {@const tip = bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}
     <button
       class="segment"
       class:selected={selectedStart === bucket.start}
       class:clickable={bucket.status !== 'empty'}
       data-status={bucket.status}
-      aria-label={bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}
+      aria-label={tip}
       onclick={() => handleClick(bucket)}
     >
-      <span class="tooltip">{bucket.status === 'empty' ? `${bucket.label}: no data` : `${bucket.label}: ${bucket.status}`}</span>
+      <span class="tooltip">{tip}</span>
     </button>
   {/each}
 </div>

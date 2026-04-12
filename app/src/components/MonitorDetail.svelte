@@ -16,21 +16,24 @@
   let state = $state<LoadState>({ type: 'loading' })
   let selectedRange = $state<{ start: number; end: number; label: string } | null>(null)
 
-  const selectedLogs = $derived<ReadonlyArray<CheckResult>>((() => {
+  const MS_PER_DAY = 86_400_000
+
+  const selectedLogs = $derived.by<ReadonlyArray<CheckResult>>(() => {
     if (state.type !== 'loaded' || selectedRange === null) return []
     return state.detail.history.filter(
       (r) => r.checkedAt >= selectedRange.start && r.checkedAt < selectedRange.end
     )
-  })())
+  })
 
-  const historySpanLabel = $derived<string>((() => {
+  const historySpanLabel = $derived.by<string>(() => {
     if (state.type !== 'loaded') return ''
     const h = state.detail.history
     if (h.length === 0) return `${state.detail.monitor.historyDays}-day history`
-    const earliest = Math.min(...h.map((r) => r.checkedAt))
-    const spanDays = Math.ceil((Date.now() - earliest) / 86_400_000)
+    let earliest = Infinity
+    for (const r of h) if (r.checkedAt < earliest) earliest = r.checkedAt
+    const spanDays = Math.ceil((Date.now() - earliest) / MS_PER_DAY)
     return spanDays <= 1 ? 'Today' : `${spanDays}-day history`
-  })())
+  })
 
   async function load() {
     state = { type: 'loading' }
@@ -58,7 +61,7 @@
   }
 
   function handleBucketSelect(range: { start: number; end: number; label: string }) {
-    selectedRange = selectedRange?.label === range.label ? null : range
+    selectedRange = selectedRange?.start === range.start ? null : range
   }
 
   onMount(load)
