@@ -4,8 +4,8 @@ import type { NotificationSenderFactory } from './NotificationSenderFactory.ts'
 import { EventFilteredNotificationSender } from './EventFilteredNotificationSender.ts'
 import { CompositeNotificationSender } from './CompositeNotificationSender.ts'
 
-export type SenderConstructor = (url: string) => NotificationSender
-export type UrlResolver = (raw: string) => string | null
+type SenderConstructor = (url: string) => NotificationSender
+type UrlResolver = (raw: string) => string | null
 
 export class EnvNotificationSenderFactory implements NotificationSenderFactory {
   constructor(
