@@ -8,4 +8,5 @@ export interface Env {
   readonly CACHE_TTL: string
   readonly MAX_BODY_BYTES: string
   readonly HISTORY_DAYS: string
+  readonly MAX_WS_CONNECTIONS?: string
 }

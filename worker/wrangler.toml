@@ -10,6 +10,7 @@ SITE_THEMES = "cyberpunk,terminal,clean-dark,light,corporate"
 CACHE_TTL = "30"
 MAX_BODY_BYTES = "1048576"
 HISTORY_DAYS = "90"
+MAX_WS_CONNECTIONS = "50"
 
 [assets]
 directory = "../app/dist"
