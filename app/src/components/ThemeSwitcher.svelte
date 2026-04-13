@@ -6,33 +6,48 @@
   let { themes }: Props = $props()
 
   let current = $state<Theme>(getSavedTheme(themes, themes[0] as Theme))
+  let open = $state(false)
 
   function select(theme: Theme) {
     current = theme
     applyTheme(theme)
+    open = false
+  }
+
+  function handleClickOutside(e: MouseEvent) {
+    const target = e.target as HTMLElement
+    if (!target.closest('.theme-picker')) open = false
   }
 </script>
 
-<div class="switcher" role="group" aria-label="Theme">
-  {#each themes as themeId (themeId)}
-    {@const label = THEME_LABELS[themeId as Theme] ?? themeId}
-    <button
-      class="option"
-      aria-pressed={current === themeId}
-      onclick={() => select(themeId as Theme)}
-    >
-      {label}
-    </button>
-  {/each}
+<svelte:document onclick={handleClickOutside} />
+
+<div class="theme-picker">
+  <button class="trigger" onclick={() => { open = !open }} aria-expanded={open}>
+    {THEME_LABELS[current] ?? current}
+  </button>
+  {#if open}
+    <div class="dropdown">
+      {#each themes as themeId (themeId)}
+        {@const label = THEME_LABELS[themeId as Theme] ?? themeId}
+        <button
+          class="dropdown-item"
+          class:active={current === themeId}
+          onclick={() => select(themeId as Theme)}
+        >
+          {label}
+        </button>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <style>
-  .switcher {
-    display: flex;
-    gap: var(--upp-spacing-1);
+  .theme-picker {
+    position: relative;
   }
 
-  .option {
+  .trigger {
     background: none;
     border: 1px solid var(--upp-color-border-subtle);
     color: var(--upp-color-text-secondary);
@@ -42,11 +57,48 @@
     border-radius: var(--upp-radius-full);
     cursor: pointer;
     transition: all var(--upp-transition-fast);
+    white-space: nowrap;
   }
 
-  .option[aria-pressed='true'] {
+  .trigger:hover,
+  .trigger[aria-expanded='true'] {
     border-color: var(--upp-color-accent-primary);
     color: var(--upp-color-accent-primary);
-    background: var(--upp-color-accent-glow);
+  }
+
+  .dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 140px;
+    background: var(--upp-color-bg-raised);
+    border: 1px solid var(--upp-color-border-default);
+    border-radius: var(--upp-radius-md);
+    padding: var(--upp-spacing-1) 0;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .dropdown-item {
+    background: none;
+    border: none;
+    color: var(--upp-color-text-secondary);
+    font-family: var(--upp-font-family-ui);
+    font-size: var(--upp-font-size-sm);
+    padding: var(--upp-spacing-2) var(--upp-spacing-4);
+    text-align: left;
+    cursor: pointer;
+    transition: all var(--upp-transition-fast);
+  }
+
+  .dropdown-item:hover {
+    background: var(--upp-color-bg-surface);
+    color: var(--upp-color-text-primary);
+  }
+
+  .dropdown-item.active {
+    color: var(--upp-color-accent-primary);
   }
 </style>
