@@ -15,4 +15,7 @@ export interface CheckResultRepository {
   latestByMonitor(
     monitorId: string
   ): Promise<Result<CheckOutcome | null, CheckResultRepositoryError>>
+  lastCheckedAtByMonitors(
+    monitorIds: ReadonlyArray<string>
+  ): Promise<Result<ReadonlyMap<string, number>, CheckResultRepositoryError>>
 }

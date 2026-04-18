@@ -93,4 +93,25 @@ export class D1CheckResultRepository implements CheckResultRepository {
 
     return ok(rowToCheckOutcome(row))
   }
+
+  async lastCheckedAtByMonitors(
+    monitorIds: ReadonlyArray<string>
+  ): Promise<Result<ReadonlyMap<string, number>, CheckResultRepositoryError>> {
+    if (monitorIds.length === 0) return ok(new Map())
+
+    const placeholders = monitorIds.map(() => '?').join(', ')
+    const result = await this.db
+      .prepare(
+        `SELECT monitor_id, MAX(checked_at) AS last_checked_at FROM check_results WHERE monitor_id IN (${placeholders}) GROUP BY monitor_id`
+      )
+      .bind(...monitorIds)
+      .all<{ monitor_id: string; last_checked_at: number }>()
+
+    if (!result.success) {
+      return err({ type: 'db_error', message: 'Failed to fetch last checked times' })
+    }
+
+    const map = new Map(result.results.map((r) => [r.monitor_id, r.last_checked_at]))
+    return ok(map)
+  }
 }

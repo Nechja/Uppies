@@ -1,22 +1,51 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
 [data-theme="terminal"] {
+  --upp-spacing-1: 4px;
+  --upp-spacing-2: 8px;
+  --upp-spacing-3: 12px;
+  --upp-spacing-4: 16px;
+  --upp-spacing-6: 24px;
+  --upp-spacing-8: 32px;
+  --upp-spacing-12: 48px;
+  --upp-spacing-16: 64px;
+  --upp-radius-sm: 4px;
+  --upp-radius-md: 8px;
+  --upp-radius-lg: 12px;
+  --upp-radius-full: 9999px;
+  --upp-font-size-xs: 11px;
+  --upp-font-size-sm: 13px;
+  --upp-font-size-md: 15px;
+  --upp-font-size-lg: 18px;
+  --upp-font-size-xl: 24px;
+  --upp-font-size-2xl: 32px;
+  --upp-font-size-3xl: 48px;
+  --upp-font-weight-normal: 400;
+  --upp-font-weight-medium: 500;
+  --upp-font-weight-bold: 700;
   --upp-font-family-base: 'Monaspace Neon', 'Courier New', monospace;
   --upp-font-family-ui: 'Monaspace Neon', 'Courier New', monospace;
+  --upp-transition-fast: 120ms ease;
+  --upp-transition-base: 200ms ease;
   --upp-color-bg-base: #000000;
-  --upp-color-bg-surface: #080808;
-  --upp-color-bg-raised: #101010;
+  --upp-color-bg-surface: #0a0a0a;
+  --upp-color-bg-raised: #111111;
   --upp-color-border-subtle: #1a1a1a;
-  --upp-color-border-default: #282828;
+  --upp-color-border-default: #2a2a2a;
   --upp-color-border-bright: #33ff66;
   --upp-color-text-primary: #33ff66;
   --upp-color-text-secondary: #22cc55;
-  --upp-color-text-muted: #136028;
+  --upp-color-text-muted: #115522;
   --upp-color-status-up: #33ff66;
-  --upp-color-status-degraded: #ffee00;
+  --upp-color-status-degraded: #ffff00;
   --upp-color-status-down: #ff3333;
-  --upp-color-status-unknown: #333333;
+  --upp-color-status-unknown: #444444;
   --upp-color-accent-primary: #33ff66;
   --upp-color-accent-secondary: #00ffff;
-  --upp-color-accent-glow: rgba(51, 255, 102, 0.12);
-  --upp-effect-glow-status: 0 0 8px currentColor;
-  --upp-effect-glow-accent: 0 0 12px rgba(51, 255, 102, 0.5);
+  --upp-color-accent-glow: rgba(51,255,102,0.15);
+  --upp-effect-glow-status: 0 0 6px currentColor;
+  --upp-effect-glow-accent: 0 0 12px rgba(51,255,102,0.5);
+  --upp-effect-scanlines: 1;
 }

@@ -1,22 +1,51 @@
+/**
+ * Do not edit directly, this file was auto-generated.
+ */
+
 [data-theme="clean-dark"] {
-  --upp-font-family-base: 'DM Sans', system-ui, sans-serif;
-  --upp-font-family-ui: 'DM Sans', system-ui, sans-serif;
-  --upp-color-bg-base: #18181b;
-  --upp-color-bg-surface: #222225;
-  --upp-color-bg-raised: #2c2c30;
-  --upp-color-border-subtle: #303034;
-  --upp-color-border-default: #3f3f46;
-  --upp-color-border-bright: #52525b;
-  --upp-color-text-primary: #fafafa;
-  --upp-color-text-secondary: #a1a1aa;
-  --upp-color-text-muted: #63636b;
+  --upp-spacing-1: 4px;
+  --upp-spacing-2: 8px;
+  --upp-spacing-3: 12px;
+  --upp-spacing-4: 16px;
+  --upp-spacing-6: 24px;
+  --upp-spacing-8: 32px;
+  --upp-spacing-12: 48px;
+  --upp-spacing-16: 64px;
+  --upp-radius-sm: 4px;
+  --upp-radius-md: 8px;
+  --upp-radius-lg: 12px;
+  --upp-radius-full: 9999px;
+  --upp-font-size-xs: 11px;
+  --upp-font-size-sm: 13px;
+  --upp-font-size-md: 15px;
+  --upp-font-size-lg: 18px;
+  --upp-font-size-xl: 24px;
+  --upp-font-size-2xl: 32px;
+  --upp-font-size-3xl: 48px;
+  --upp-font-weight-normal: 400;
+  --upp-font-weight-medium: 500;
+  --upp-font-weight-bold: 700;
+  --upp-font-family-base: 'Inter', system-ui, sans-serif;
+  --upp-font-family-ui: 'Inter', system-ui, sans-serif;
+  --upp-transition-fast: 120ms ease;
+  --upp-transition-base: 200ms ease;
+  --upp-color-bg-base: #1c1c1c;
+  --upp-color-bg-surface: #252525;
+  --upp-color-bg-raised: #2f2f2f;
+  --upp-color-border-subtle: #333333;
+  --upp-color-border-default: #424242;
+  --upp-color-border-bright: #5a5a5a;
+  --upp-color-text-primary: #f5f5f5;
+  --upp-color-text-secondary: #a3a3a3;
+  --upp-color-text-muted: #6b6b6b;
   --upp-color-status-up: #22c55e;
   --upp-color-status-degraded: #f59e0b;
   --upp-color-status-down: #ef4444;
-  --upp-color-status-unknown: #52525b;
+  --upp-color-status-unknown: #525252;
   --upp-color-accent-primary: #3b82f6;
   --upp-color-accent-secondary: #06b6d4;
-  --upp-color-accent-glow: rgba(59, 130, 246, 0.10);
+  --upp-color-accent-glow: rgba(59,130,246,0.10);
   --upp-effect-glow-status: none;
   --upp-effect-glow-accent: none;
+  --upp-effect-scanlines: 0;
 }
