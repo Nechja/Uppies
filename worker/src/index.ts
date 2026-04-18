@@ -7,6 +7,7 @@ import { HttpCheckRunner } from './checks/HttpCheckRunner.ts'
 import { TlsCheckRunner } from './checks/TlsCheckRunner.ts'
 import { TcpCheckRunner } from './checks/TcpCheckRunner.ts'
 import { CheckRunnerRegistry } from './checks/CheckRunnerRegistry.ts'
+import type { NotificationSender } from './notifications/NotificationSender.ts'
 import { DiscordNotificationSender } from './notifications/DiscordNotificationSender.ts'
 import { WebhookNotificationSender } from './notifications/WebhookNotificationSender.ts'
 import { EnvNotificationSenderFactory } from './notifications/EnvNotificationSenderFactory.ts'
@@ -40,7 +41,7 @@ function buildServices(env: Env) {
 
   const notificationSenderFactory = new EnvNotificationSenderFactory(
     resolveUrl,
-    new Map([
+    new Map<string, (url: string) => NotificationSender>([
       ['discord', (url: string) => new DiscordNotificationSender(url)],
       ['webhook', (url: string) => new WebhookNotificationSender(url)],
     ])
@@ -125,10 +126,10 @@ export default {
       return cachedJson(request, env, () => services.statusHandler.handle())
     }
 
-    const monitorMatch = monitorIdPattern.exec(url.pathname)
-    if (monitorMatch !== null && monitorMatch[1] !== undefined) {
+    const monitorId = monitorIdPattern.exec(url.pathname)?.[1]
+    if (monitorId !== undefined) {
       return cachedJson(request, env, () =>
-        services.monitorDetailHandler.handle(monitorMatch[1])
+        services.monitorDetailHandler.handle(monitorId)
       )
     }
 

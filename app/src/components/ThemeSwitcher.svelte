@@ -2,10 +2,12 @@
   import { THEME_LABELS, applyTheme, getSavedTheme } from '../lib/theme.ts'
   import type { Theme } from '../lib/types.ts'
 
+  import { untrack } from 'svelte'
+
   type Props = { themes: ReadonlyArray<string> }
   let { themes }: Props = $props()
 
-  let current = $state<Theme>(getSavedTheme(themes, themes[0] as Theme))
+  let current = $state<Theme>(untrack(() => getSavedTheme(themes, themes[0] as Theme)))
   let open = $state(false)
 
   function select(theme: Theme) {
