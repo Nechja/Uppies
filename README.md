@@ -50,6 +50,25 @@ pnpm deploy
 
 The cron runs every minute. Each monitor runs according to its `interval_seconds` setting. Results show up at your worker URL.
 
+### Automated deploy
+
+If you'd rather deploy via GitHub Actions on push to main, skip steps 2-3 and 5-7 above and set these in your repo settings under Settings > Secrets and variables > Actions:
+
+| Type | Name | Required | Description |
+|---|---|---|---|
+| Secret | `CLOUDFLARE_API_TOKEN` | Yes | API token with Workers and D1 permissions |
+| Secret | `CLOUDFLARE_ACCOUNT_ID` | Yes | Your Cloudflare account ID |
+| Secret | `CLOUDFLARE_D1_DATABASE_ID` | Yes | D1 database ID from `wrangler d1 create` |
+| Variable | `SITE_DOMAIN` | No | Custom domain (omit to use `*.workers.dev`) |
+| Variable | `SITE_TITLE` | No | Page title (default: Uppies) |
+| Variable | `SITE_THEME` | No | Default theme (default: cyberpunk) |
+| Variable | `SITE_THEMES` | No | Available themes list |
+| Variable | `CACHE_TTL` | No | API cache seconds (default: 30) |
+| Variable | `MAX_BODY_BYTES` | No | Max body read size (default: 1048576) |
+| Variable | `HISTORY_DAYS` | No | Days of history shown (default: 90) |
+
+The included workflow handles schema migration, monitor seeding, and deploy automatically on every push.
+
 ## Notifications (optional)
 
 Add a `notify` block to any monitor in `monitors.yml`:
