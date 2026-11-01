@@ -2,7 +2,7 @@ import type { D1Database } from '@cloudflare/workers-types'
 import { ok, err } from '../result.ts'
 import type { Result } from '../result.ts'
 import type { Monitor } from '../types/monitor.ts'
-import type { MonitorRepository, MonitorRepositoryError } from './MonitorRepository.ts'
+import type { MonitorRepository, MonitorRepositoryError, MonitorStatusUpdate } from './MonitorRepository.ts'
 
 type MonitorRow = {
   readonly id: string
@@ -16,6 +16,11 @@ type MonitorRow = {
   readonly tls_warn_days: number
   readonly enabled: number
   readonly config_json: string
+  readonly last_checked_at: number | null
+  readonly current_status: string | null
+  readonly response_ms: number | null
+  readonly tls_days_remaining: number | null
+  readonly uptime_percent: number | null
 }
 
 function parseConfig(raw: string): Partial<Monitor> {
@@ -37,6 +42,11 @@ function rowToMonitor(row: MonitorRow): Monitor {
     tlsWarnDays: row.tls_warn_days,
     enabled: row.enabled === 1,
     notify: config.notify ?? [],
+    lastCheckedAt: row.last_checked_at ?? null,
+    currentStatus: row.current_status ?? null,
+    responseMs: row.response_ms ?? null,
+    tlsDaysRemaining: row.tls_days_remaining ?? null,
+    uptimePercent: row.uptime_percent ?? null,
     ...(row.url !== null && { url: row.url }),
     ...(row.host !== null && { host: row.host }),
     ...(row.port !== null && { port: row.port }),
@@ -97,7 +107,11 @@ export class D1MonitorRepository implements MonitorRepository {
           monitor.timeoutMs,
           monitor.tlsWarnDays,
           monitor.enabled ? 1 : 0,
-          JSON.stringify({ expect: monitor.expect, notify: monitor.notify })
+          JSON.stringify({
+            ...(monitor.historyDays !== undefined && { historyDays: monitor.historyDays }),
+            expect: monitor.expect,
+            notify: monitor.notify,
+          })
         )
     )
 
@@ -110,4 +124,69 @@ export class D1MonitorRepository implements MonitorRepository {
 
     return ok(undefined)
   }
+
+  async updateStatus(
+    id: string,
+    update: MonitorStatusUpdate
+  ): Promise<Result<void, MonitorRepositoryError>> {
+    const query = update.uptimePercent !== undefined
+      ? `UPDATE monitors SET
+           last_checked_at = ?,
+           current_status = ?,
+           response_ms = ?,
+           tls_days_remaining = ?,
+           uptime_percent = ?
+         WHERE id = ?`
+      : `UPDATE monitors SET
+           last_checked_at = ?,
+           current_status = ?,
+           response_ms = ?,
+           tls_days_remaining = ?
+         WHERE id = ?`
+
+    const params = update.uptimePercent !== undefined
+      ? [
+          update.lastCheckedAt,
+          update.currentStatus,
+          update.responseMs ?? null,
+          update.tlsDaysRemaining ?? null,
+          update.uptimePercent ?? null,
+          id,
+        ]
+      : [
+          update.lastCheckedAt,
+          update.currentStatus,
+          update.responseMs ?? null,
+          update.tlsDaysRemaining ?? null,
+          id,
+        ]
+
+    const result = await this.db
+      .prepare(query)
+      .bind(...params)
+      .run()
+
+    if (!result.success) {
+      return err({ type: 'db_error', message: `Failed to update status for monitor ${id}` })
+    }
+
+    return ok(undefined)
+  }
+
+  async updateUptimePercent(
+    id: string,
+    uptimePercent: number
+  ): Promise<Result<void, MonitorRepositoryError>> {
+    const result = await this.db
+      .prepare('UPDATE monitors SET uptime_percent = ? WHERE id = ?')
+      .bind(uptimePercent, id)
+      .run()
+
+    if (!result.success) {
+      return err({ type: 'db_error', message: `Failed to update uptime percent for monitor ${id}` })
+    }
+
+    return ok(undefined)
+  }
 }
+

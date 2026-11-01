@@ -1,7 +1,4 @@
 import type { MonitorRepository } from '../repositories/MonitorRepository.ts'
-import type { CheckResultRepository } from '../repositories/CheckResultRepository.ts'
-import { unwrapOr } from '../result.ts'
-import { calculateUptimePercent } from '../uptime.ts'
 
 type MonitorStatus = {
   readonly id: string
@@ -18,7 +15,6 @@ type MonitorStatus = {
 export class StatusHandler {
   constructor(
     private readonly monitorRepository: MonitorRepository,
-    private readonly checkResultRepository: CheckResultRepository,
     private readonly defaultHistoryDays: number
   ) {}
 
@@ -28,32 +24,19 @@ export class StatusHandler {
       return Response.json({ error: 'Failed to load monitors' }, { status: 500 })
     }
 
-    const statuses = await Promise.all(
-      monitorsResult.value.map(async (monitor): Promise<MonitorStatus> => {
-        const days = monitor.historyDays ?? this.defaultHistoryDays
-
-        const [latestResult, historyResult] = await Promise.all([
-          this.checkResultRepository.latestByMonitor(monitor.id),
-          this.checkResultRepository.listByMonitor(monitor.id, days),
-        ])
-
-        const latest = unwrapOr(latestResult, null)
-        const history = unwrapOr(historyResult, [])
-
-        return {
-          id: monitor.id,
-          name: monitor.name,
-          type: monitor.type,
-          historyDays: days,
-          currentStatus: latest?.status ?? null,
-          lastCheckedAt: latest?.checkedAt ?? null,
-          responseMs: latest?.responseMs ?? null,
-          tlsDaysRemaining: latest?.tlsDaysRemaining ?? null,
-          uptimePercent: calculateUptimePercent(history),
-        }
-      })
-    )
+    const statuses: ReadonlyArray<MonitorStatus> = monitorsResult.value.map((monitor) => ({
+      id: monitor.id,
+      name: monitor.name,
+      type: monitor.type,
+      historyDays: monitor.historyDays ?? this.defaultHistoryDays,
+      currentStatus: monitor.currentStatus ?? null,
+      lastCheckedAt: monitor.lastCheckedAt ?? null,
+      responseMs: monitor.responseMs ?? null,
+      tlsDaysRemaining: monitor.tlsDaysRemaining ?? null,
+      uptimePercent: monitor.uptimePercent ?? null,
+    }))
 
     return Response.json({ monitors: statuses })
   }
 }
+

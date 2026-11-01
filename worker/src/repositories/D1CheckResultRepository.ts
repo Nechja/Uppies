@@ -114,4 +114,79 @@ export class D1CheckResultRepository implements CheckResultRepository {
     const map = new Map(result.results.map((r) => [r.monitor_id, r.last_checked_at]))
     return ok(map)
   }
+
+  async recordDailyStat(
+    monitorId: string,
+    date: string,
+    status: string
+  ): Promise<Result<void, CheckResultRepositoryError>> {
+    const isUp = status === 'up' ? 1 : 0
+    const isDegraded = status === 'degraded' ? 1 : 0
+    const isDown = status === 'down' ? 1 : 0
+
+    const result = await this.db
+      .prepare(
+        `INSERT INTO monitor_daily_stats (monitor_id, date, total_checks, up_checks, degraded_checks, down_checks)
+         VALUES (?, ?, 1, ?, ?, ?)
+         ON CONFLICT(monitor_id, date) DO UPDATE SET
+           total_checks = total_checks + 1,
+           up_checks = up_checks + excluded.up_checks,
+           degraded_checks = degraded_checks + excluded.degraded_checks,
+           down_checks = down_checks + excluded.down_checks`
+      )
+      .bind(monitorId, date, isUp, isDegraded, isDown)
+      .run()
+
+    if (!result.success) {
+      return err({ type: 'db_error', message: 'Failed to record daily stat' })
+    }
+
+    return ok(undefined)
+  }
+
+  async calculateUptimeFromStats(
+    monitorId: string,
+    sinceDate: string
+  ): Promise<Result<number | null, CheckResultRepositoryError>> {
+    const row = await this.db
+      .prepare(
+        `SELECT
+           SUM(total_checks) AS total,
+           SUM(up_checks) AS up_count
+         FROM monitor_daily_stats
+         WHERE monitor_id = ? AND date >= ?`
+      )
+      .bind(monitorId, sinceDate)
+      .first<{ total: number | null; up_count: number | null }>()
+
+    if (row === null || row.total === null || row.total === 0) {
+      return ok(null)
+    }
+
+    const upCount = row.up_count ?? 0
+    const percent = Math.round((upCount / row.total) * 1000) / 10
+    return ok(percent)
+  }
+
+  async deleteOlderThan(
+    cutoffTimestampMs: number,
+    cutoffDate: string
+  ): Promise<Result<void, CheckResultRepositoryError>> {
+    const results = await this.db.batch([
+      this.db
+        .prepare('DELETE FROM check_results WHERE checked_at < ?')
+        .bind(cutoffTimestampMs),
+      this.db
+        .prepare('DELETE FROM monitor_daily_stats WHERE date < ?')
+        .bind(cutoffDate),
+    ])
+
+    const failed = results.find((r) => !r.success)
+    if (failed !== undefined) {
+      return err({ type: 'db_error', message: 'Failed to delete expired records' })
+    }
+
+    return ok(undefined)
+  }
 }
+

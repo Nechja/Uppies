@@ -34,11 +34,11 @@ export class MonitorDetailHandler {
       name: monitorResult.value.name,
       type: monitorResult.value.type,
       historyDays: days,
-      currentStatus: latest?.status ?? null,
-      lastCheckedAt: latest?.checkedAt ?? null,
-      responseMs: latest?.responseMs ?? null,
-      tlsDaysRemaining: latest?.tlsDaysRemaining ?? null,
-      uptimePercent: calculateUptimePercent(history),
+      currentStatus: monitorResult.value.currentStatus ?? latest?.status ?? null,
+      lastCheckedAt: monitorResult.value.lastCheckedAt ?? latest?.checkedAt ?? null,
+      responseMs: monitorResult.value.responseMs ?? latest?.responseMs ?? null,
+      tlsDaysRemaining: monitorResult.value.tlsDaysRemaining ?? latest?.tlsDaysRemaining ?? null,
+      uptimePercent: monitorResult.value.uptimePercent ?? calculateUptimePercent(history),
     }
 
     return Response.json({ monitor, history, incidents })

@@ -12,37 +12,56 @@ export class MonitorCheckService {
     private readonly checkResultRepository: CheckResultRepository,
     private readonly checkDispatcher: CheckDispatcher,
     private readonly outcomeHandler: OutcomeHandler,
-    private readonly notificationSenderFactory: NotificationSenderFactory
+    private readonly notificationSenderFactory: NotificationSenderFactory,
+    private readonly defaultHistoryDays: number = 90
   ) {}
 
-  async runAllChecks(): Promise<Result<void, { message: string }>> {
+  async runAllChecks(): Promise<Result<{ checksRan: number }, { message: string }>> {
     const monitorsResult = await this.monitorRepository.listAll()
-    if (!monitorsResult.ok) return ok(undefined)
+    if (!monitorsResult.ok) return ok({ checksRan: 0 })
 
     const allMonitors = monitorsResult.value
-    const ids = allMonitors.map((m) => m.id)
-    const lastCheckedResult = await this.checkResultRepository.lastCheckedAtByMonitors(ids)
-    const lastCheckedMap = lastCheckedResult.ok ? lastCheckedResult.value : new Map<string, number>()
-
     const now = Date.now()
     const dueMonitors = allMonitors.filter((monitor) => {
-      const lastChecked = lastCheckedMap.get(monitor.id)
-      if (lastChecked === undefined) return true
+      const lastChecked = monitor.lastCheckedAt
+      if (lastChecked === null || lastChecked === undefined) return true
       return now - lastChecked >= monitor.intervalSeconds * 1000
     })
+
+    if (dueMonitors.length === 0) {
+      return ok({ checksRan: 0 })
+    }
 
     await Promise.allSettled(
       dueMonitors.map(async (monitor) => {
         const result = await this.checkDispatcher.run(monitor)
         if (!result.ok) return
 
-        await this.checkResultRepository.insert(result.value)
+        const outcome = result.value
+        await this.checkResultRepository.insert(outcome)
+
+        const date = new Date(outcome.checkedAt).toISOString().slice(0, 10)
+        await this.checkResultRepository.recordDailyStat(monitor.id, date, outcome.status)
+
+        const days = monitor.historyDays ?? this.defaultHistoryDays
+        const cutoffDate = new Date(now - days * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+        const uptimeRes = await this.checkResultRepository.calculateUptimeFromStats(monitor.id, cutoffDate)
+        const uptimePercent = uptimeRes.ok ? uptimeRes.value : null
+
+        await this.monitorRepository.updateStatus(monitor.id, {
+          lastCheckedAt: outcome.checkedAt,
+          currentStatus: outcome.status,
+          responseMs: outcome.responseMs ?? null,
+          tlsDaysRemaining: outcome.tlsDaysRemaining ?? null,
+          uptimePercent,
+        })
 
         const notificationSender = this.notificationSenderFactory.buildForMonitor(monitor)
-        await this.outcomeHandler.handleOutcome(monitor, result.value, notificationSender)
+        await this.outcomeHandler.handleOutcome(monitor, outcome, notificationSender)
       })
     )
 
-    return ok(undefined)
+    return ok({ checksRan: dueMonitors.length })
   }
 }
+

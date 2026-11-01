@@ -18,4 +18,18 @@ export interface CheckResultRepository {
   lastCheckedAtByMonitors(
     monitorIds: ReadonlyArray<string>
   ): Promise<Result<ReadonlyMap<string, number>, CheckResultRepositoryError>>
+  recordDailyStat(
+    monitorId: string,
+    date: string,
+    status: string
+  ): Promise<Result<void, CheckResultRepositoryError>>
+  calculateUptimeFromStats(
+    monitorId: string,
+    sinceDate: string
+  ): Promise<Result<number | null, CheckResultRepositoryError>>
+  deleteOlderThan(
+    cutoffTimestampMs: number,
+    cutoffDate: string
+  ): Promise<Result<void, CheckResultRepositoryError>>
 }
+

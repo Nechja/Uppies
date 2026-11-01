@@ -54,12 +54,12 @@ function buildServices(env: Env) {
     checkResultRepository,
     checkRunnerRegistry,
     incidentService,
-    notificationSenderFactory
+    notificationSenderFactory,
+    defaultHistoryDays
   )
 
   const statusHandler = new StatusHandler(
     monitorRepository,
-    checkResultRepository,
     defaultHistoryDays
   )
 
@@ -138,7 +138,16 @@ export default {
 
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     const { monitorCheckService, statusHandler } = buildServices(env)
-    await monitorCheckService.runAllChecks()
-    ctx.waitUntil(broadcastStatus(env, statusHandler))
+    const checkResult = await monitorCheckService.runAllChecks()
+
+    if (checkResult.ok && checkResult.value.checksRan > 0) {
+      ctx.waitUntil(broadcastStatus(env, statusHandler))
+    }
+
+    const defaultHistoryDays = parseInt(env.HISTORY_DAYS, 10) || 90
+    const cutoffMs = Date.now() - defaultHistoryDays * 24 * 60 * 60 * 1000
+    const cutoffDate = new Date(cutoffMs).toISOString().slice(0, 10)
+    const checkResultRepository = new D1CheckResultRepository(env.DB)
+    ctx.waitUntil(checkResultRepository.deleteOlderThan(cutoffMs, cutoffDate))
   },
 }
