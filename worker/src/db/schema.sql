@@ -9,7 +9,12 @@ CREATE TABLE IF NOT EXISTS monitors (
   timeout_ms      INTEGER NOT NULL DEFAULT 10000,
   tls_warn_days   INTEGER NOT NULL DEFAULT 30,
   enabled         INTEGER NOT NULL DEFAULT 1,
-  config_json     TEXT NOT NULL DEFAULT '{}'
+  config_json     TEXT NOT NULL DEFAULT '{}',
+  last_checked_at INTEGER,
+  current_status  TEXT,
+  response_ms     INTEGER,
+  tls_days_remaining INTEGER,
+  uptime_percent  REAL
 );
 
 CREATE TABLE IF NOT EXISTS check_results (
@@ -25,6 +30,16 @@ CREATE TABLE IF NOT EXISTS check_results (
 
 CREATE INDEX IF NOT EXISTS idx_check_results_monitor_time
   ON check_results(monitor_id, checked_at DESC);
+
+CREATE TABLE IF NOT EXISTS monitor_daily_stats (
+  monitor_id      TEXT NOT NULL REFERENCES monitors(id) ON DELETE CASCADE,
+  date            TEXT NOT NULL,
+  total_checks    INTEGER NOT NULL DEFAULT 0,
+  up_checks       INTEGER NOT NULL DEFAULT 0,
+  degraded_checks INTEGER NOT NULL DEFAULT 0,
+  down_checks     INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (monitor_id, date)
+);
 
 CREATE TABLE IF NOT EXISTS incidents (
   id              TEXT PRIMARY KEY,

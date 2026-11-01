@@ -6,7 +6,7 @@
     "build": "tsx style-dictionary.config.ts"
   },
   "devDependencies": {
-    "style-dictionary": "^4.0.0",
+    "style-dictionary": "^5.7.1",
     "typescript": "^5.5.0"
   }
 }

@@ -31,4 +31,10 @@ export type Monitor = {
   readonly historyDays?: number
   readonly expect?: HttpExpectation
   readonly notify: ReadonlyArray<NotifyChannel>
+  readonly lastCheckedAt?: number | null
+  readonly currentStatus?: string | null
+  readonly responseMs?: number | null
+  readonly tlsDaysRemaining?: number | null
+  readonly uptimePercent?: number | null
 }
+
